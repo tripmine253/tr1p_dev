@@ -1,0 +1,58 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# =========================
+# Operating System Files
+# =========================
+
+# OSX
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+testExport.xlsx
+test.ps1
+testPwd.xlsx
+test.csv
+EditPSM1.ps1
+TryTitle.ps1
+data/Sheet10.txt
+data/Sheet20.txt
+ImportExcel-Copy.psm1
+TryCCFmt.ps1
+test.xlsx
+testCCFMT.ps1
+testHide.ps1
+ImportExcel.zip
+*.xlsx

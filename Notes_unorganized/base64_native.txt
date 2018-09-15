@@ -1,0 +1,5 @@
+Encode a data file to Base64
+certutil -encode data.txt tmp.b64 && findstr /v /c:- tmp.b64 > data.b64
+-------------------------------------
+Decode a Base64 file
+certutil -decode data.b64 data.txt

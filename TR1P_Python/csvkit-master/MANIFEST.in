@@ -1,0 +1,7 @@
+include COPYING
+include README.rst
+recursive-include docs *
+recursive-include examples *
+recursive-include tests *.py
+include AUTHORS.rst
+include CHANGELOG.rst

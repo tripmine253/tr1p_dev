@@ -1,0 +1,17 @@
+get-addomain | select -exp DistinguishedName | get-adobject -prop 'ms-DS-MachineAccountQuota' | select -exp ms-DS-MachineAccountQuota
+
+Get-ADComputer -fi {ms-DS-CreatorSID -like '*'}
+
+$sid = (get-aduser OneBoredAdmin).SID
+Get-ADComputer -fi {ms-DS-CreatorSID -eq $sid}
+
+get-adcomputer -fi {ms-DS-CreatorSID -like '*'} -prop ms-DS-CreatorSID | group ms-DS-CreatorSID | %{
+    $ret = $_ | select Count,@{name='UserName';Expression={$_.Name}},@{name='ComputerNames';Expression={$_.Group | select -exp Name}}
+    # Try to resolve the SID into an account
+    try{
+        $_.Name = $_.Name.Translate([System.Security.Principal.NTAccount])
+    }catch{}
+    $ret
+}
+
+https://blog.backslasher.net/preventing-users-from-adding-computers-to-a-domain.html

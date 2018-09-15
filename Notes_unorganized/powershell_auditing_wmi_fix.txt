@@ -1,0 +1,30 @@
+
+
+
+workaround to PSREmoting execution 
+	winrm create wincimv2/win32_process '@{CommandLine="notepad.exe"}' -r:host
+
+	
+Disabling the WMI plugin for WinRM
+
+To disable the WMI plugin for WinRM, run the PowerShell command set-item -Path "WSMan:\localhost\Plugin\WMI Provider\Enabled" -Value $false and restart the WinRM service.
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WSMAN\Plugin and all subkeys.
+
+Enable PowerShell module and script block logging (optional)
+The following steps enable logging for all PowerShell actions on your system. PowerShell Module Logging is not required for JEA, however it is strongly recommended that you turn it on to ensure the commands users run are logged in a central location.
+
+You can configure the PowerShell Module Logging policy using Group Policy.
+
+Open the Local Group Policy Editor on a workstation or a Group Policy Object in the Group Policy Management Console on an Active Directory Domain Controller
+Navigate to Computer Configuration\Administrative Templates\Windows Components\Windows PowerShell
+Double click on Turn on Module Logging
+Click Enabled
+In the Options section, click on Show next to Module Names
+Type "\*" in the pop up window. This instructs PowerShell to log commands from all modules.
+Click OK to set the policy
+Double click on Turn on PowerShell Script Block Logging
+Click Enabled
+Click OK to set the policy
+(On domain-joined machines only) Run gpupdate or wait for Group Policy to process the updated policy and apply the settings
+You can also enable system-wide PowerShell transcription through Group Policy.

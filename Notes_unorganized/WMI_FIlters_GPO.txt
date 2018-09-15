@@ -1,0 +1,89 @@
+
+
+Any Windows Desktop OS – Version 1 
+select * from Win32_OperatingSystem WHERE ProductType = "1"
+
+Any Windows Desktop OS – Version 2 (better for Win7 sometimes) 
+select * from Win32_OperatingSystem WHERE (ProductType <> "2") AND (ProductType <> "3")
+
+Any Windows Desktop OS – 32-bit 
+select * from Win32_OperatingSystem WHERE ProductType = "1" AND NOT OSArchitecture = "64-bit"
+
+Any Windows Desktop OS – 64-bit 
+select * from Win32_OperatingSystem WHERE ProductType = "1" AND OSArchitecture = "64-bit"
+
+
+Windows 7 
+select * from Win32_OperatingSystem WHERE Version like "6.1%" AND ProductType="1"
+
+Windows 7 – 32-bit 
+select * from Win32_OperatingSystem WHERE Version like "6.1%" AND ProductType="1" AND NOT OSArchitecture = "64-bit"
+
+Windows 7 – 64-bit 
+select * from Win32_OperatingSystem WHERE Version like "6.1%" AND ProductType="1" AND OSArchitecture = "64-bit"
+
+
+Any Windows Server OS 
+select * from Win32_OperatingSystem where (ProductType = "2") OR (ProductType = "3")
+
+Any Windows Server OS – 32-bit 
+select * from Win32_OperatingSystem where (ProductType = "2") OR (ProductType = "3") AND NOT OSArchitecture = "64-bit"
+
+Any Windows Server OS – 64-bit 
+select * from Win32_OperatingSystem where (ProductType = "2") OR (ProductType = "3") AND OSArchitecture = "64-bit"
+
+Any Windows Server – Domain Controller 
+select * from Win32_OperatingSystem where (ProductType = "2")
+
+Any Windows Server – Domain Controller – 32-bit 
+select * from Win32_OperatingSystem where (ProductType = "2") AND NOT OSArchitecture = "64-bit"
+
+Any Windows Server – Domain Controller – 64-bit 
+select * from Win32_OperatingSystem where (ProductType = "2") AND OSArchitecture = "64-bit"
+
+Any Windows Server – Non-Domain Controller 
+select * from Win32_OperatingSystem where (ProductType = "3")
+
+Any Windows Server – Non- Domain Controller – 32-bit 
+select * from Win32_OperatingSystem where (ProductType = "3") AND NOT OSArchitecture = "64-bit"
+
+Any Windows Server – Non-Domain Controller – 64-bit 
+select * from Win32_OperatingSystem where (ProductType = "3") AND OSArchitecture = "64-bit"
+
+
+
+Windows Server 2008 R2 – 64-bit – DC 
+select * from Win32_OperatingSystem WHERE Version like "6.1%" AND ProductType="2"
+
+Windows Server 2008 R2 – 64-bit – non-DC 
+select * from Win32_OperatingSystem WHERE Version like "6.1%" AND ProductType="3"
+
+
+Windows Server 2012 – 64-bit – DC 
+select * from Win32_OperatingSystem WHERE Version like "6.2%" AND ProductType="2"
+
+Windows Server 2012 – 64-bit – non-DC 
+select * from Win32_OperatingSystem WHERE Version like "6.2%" AND ProductType="3"
+
+
+Windows Server 2012 R2 – 64-bit – DC 
+select * from Win32_OperatingSystem WHERE Version like "6.3%" AND ProductType="2"
+
+Windows Server 2012 R2 – 64-bit – non-DC 
+select * from Win32_OperatingSystem WHERE Version like "6.3%" AND ProductType="3"
+
+
+Windows 10
+select * from Win32_OperatingSystem where Version like "10.%" and ProductType="1"
+
+Windows Server 2016 – non-DC 
+select * from Win32_OperatingSystem where Version like "10.%" and ProductType="3"
+
+
+Filter by Model
+Select * from Win32_ComputerSystem where model = ‘Latitude D830’
+
+
+Filter by OU
+Select * From RSOP_Session Where SOM = 'OU=SDM,DC=cpandl,DC=com'
+Select * From RSOP_Session Where NOT SOM = 'OU=SDM,DC=cpandl,DC=com'
