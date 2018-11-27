@@ -1,7 +1,7 @@
 ﻿#: Title       : AutoSize & Position Window Utility
 #: Date Created: Wed Mar 6 22:20:00 EST 2013
 #: Last Edit   : Thu Jul 20 way passed my bedtime CST 2018
-#: Author      : "Tim Gomez" <timothy.d.gomez.mil@mail.mil>
+#: Author      : "Tim Gomez" <>
 #: Version     : 2.0
 #: Description : Utility script created as a proof of concept IOT expedite a monitoring station's window layout
 #:               Got annoyed that a co-worker wasted so much time sizing and positioning every week when his box rebooted.
