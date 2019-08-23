@@ -7,7 +7,7 @@ Question 1.
  - Could possibly justify the reason for it being not assembled in prior to transit for the sake of it preventing damage.
 
 #### Does the reader understand, from the instructions,  why he or she would want to read these instructions?
-The overall intent of the instructions are sufficient, placing emphasis on the setup process and assumed skill level of reader.
+The overall tone and intent of the instructions clearly define the objective, placing emphasis on the setup process and assumed skill level of reader.
 
 
 	 The reader is expected to take the following away from the instructions:
@@ -18,5 +18,5 @@ The overall intent of the instructions are sufficient, placing emphasis on the s
 
 - [ ] 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzU4MzkxNDUzXX0=
+eyJoaXN0b3J5IjpbLTE3NjY2NTMxNTNdfQ==
 -->
