@@ -1,17 +1,18 @@
 Question 1. 
-- Does the writer introduce the instructions adequately?
+ - Does the writer introduce the instructions adequately?
 > Moderate fluff used regarding the cost and overall quality of product albeit irrelevant because of the following:
-1. It's been purchased already.
-2. The material is pretty standard, even for more expensive models.
-3. Has no direct bearing on the construction.
-4. Could possibly justify the reason for it being not assembled in prior to transit for the sake of it preventing damage.
-- Does the reader understand, from the instructions?
--	iii a) Preparation steps advising adequate space.
-*	b) Identification of component placements in the unpacking phase. 
-*	c) Components of the cello are identified by individual part names
+ - It's been purchased already.
+ - The material is pretty standard, even for more expensive models.
+ - Has no direct bearing on the construction.
+ - Could possibly justify the reason for it being not assembled in prior to transit for the sake of it preventing damage.
+ - Does the reader understand, from the instructions?
+	 The reader i
+	-  Preparation steps advising adequate space.
+	-	Identification of component placements in the unpacking phase. 
+	-	Components of the cello are identified by individual part names
 - why he or she would want to read these instructions?
 
 - [ ] 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1OTg3NzE1MDldfQ==
+eyJoaXN0b3J5IjpbNjUzMTgyNzQwXX0=
 -->
