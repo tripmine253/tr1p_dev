@@ -6,15 +6,12 @@ Question 1.
 3. Has no direct bearing on the construction.
 4. Could possibly justify the reason for it being not assembled in prior to transit for the sake of it preventing damage.
 - Does the reader understand, from the instructions?
-5.
-	
-	 a. Preparation steps advising adequate space.
-	 b
- as well as the identification of component placements in the unpacking phase. 
-7. Components of the cello are identified by individual part names
+-	iii a) Preparation steps advising adequate space.
+*	b) Identification of component placements in the unpacking phase. 
+*	c) Components of the cello are identified by individual part names
 - why he or she would want to read these instructions?
 
 - [ ] 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1MjEzNTcxNDRdfQ==
+eyJoaXN0b3J5IjpbLTE1OTg3NzE1MDldfQ==
 -->
