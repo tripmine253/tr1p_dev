@@ -19,9 +19,7 @@ The overall tone and intent of the instructions clearly define the objective, pl
 Are they clear?  
 Are they the right size?
 
-[Imgur](https://imgur.com/9y8BfYM)
-
 ![garbage2](https://imgur.com/iifw2yi)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4NjkzMzA1NTddfQ==
+eyJoaXN0b3J5IjpbLTE1NjM1MDk0OV19
 -->
