@@ -2,7 +2,9 @@
 # Undergraduate Calendar
 [https://www.umuc.edu/current-students/course-registration/academic-calendar/undergraduate.cfm](https://www.umuc.edu/current-students/course-registration/academic-calendar/undergraduate.cfm)
 
-	
+learn.umuc.edu
+[https://www.youtube.com/watch?v=aCM2rodIUlg&feature=youtu.be](https://www.youtube.com/watch?v=aCM2rodIUlg&feature=youtu.be)
+
 **Online Sessions**																			
 |"Session Dates	"|	Registration Open Date|	"Registration Close Date	"|	"Last Date to Drop"|	"60% of Term Complete"|	Last Date to Withdraw / 65% of Term Complete|
 |---|--|--|--|--|--|
@@ -32,5 +34,5 @@ May 20–Jun. 16	|Feb. 11|May 19	|May 23|	Jun. 5|	Jun. 6|
 -   Create a folder on your desktop and in your e-mail. Keep all messages and files related to your course in one place that's easy to find.
 -   Identify a strategy for backing up important files (flash drive, e-mail, cloud/Google docs).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTM2NDM5MTk1OCwxMTY0MTU3NjkxXX0=
+eyJoaXN0b3J5IjpbMTI4MTYwMTU0NSwxMTY0MTU3NjkxXX0=
 -->
