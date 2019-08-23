@@ -15,8 +15,11 @@ The overall tone and intent of the instructions clearly define the objective, pl
 -	Components of the cello are identified by individual part names
 
 ## Question 2
-Comment on the graphics.  Are they clear?  Are they the right size?  Please write 2-3 sentences to support your answer.
+####  Supporting Graphics
+Are they clear?  
+Are they the right size?
+
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMTE3MTY3NF19
+eyJoaXN0b3J5IjpbLTkyMTgwNTc5Ml19
 -->
