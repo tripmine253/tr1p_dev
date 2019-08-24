@@ -12,6 +12,61 @@
 -   Paragraph content reflects reasonable transitions
 -   Content reflects synthesis and critical analysis of referenced sources
 -   Ideas are supported by referenced evidence, and full citations are provided for all reference sources
+**Summing Up a Successful Online Student**. An online course places more responsibility on the student (and subsequently more independence) than a face-to-face course. Therefore, **a successful online student must exercise more self-discipline than a face-to-face student**. A successful online student is one who:
+
+-   reads the Course Schedule's assigned reading material thoroughly before responding in a discussion
+-   prepares personal study notes (like classroom notes) each week from the reading assignment addressing key points, key figures, and defines any bold-faced terms
+-   considers outlining the course material for personal study
+-   participates two-to-three times per week in discussion and avoids late week discussion comments
+-   engages the material and others with enthusiasm and courtesy
+-   schedules adequate time to do the work
+-   asks for help when needed
+-   interacts with others in the class
+-   is self-motivated
+-   turns in well-drafted, proofed, and properly cited and referenced assignments prior to their due dates
+-   keeps copies o**Assignment**
+
+**Percentage**
+
+Discussion (7 @ 40 pts)
+
+280 pts
+
+Quizzes (7 @ 20-40 pts each)
+
+190 pts
+
+Anti-Plagiarism Pledge
+
+10 pts
+
+Credible & Reliable Resources
+
+40 pts
+
+Meal Planning - Carbs
+
+20 pts
+
+Meal Planning - Lipids
+
+20 pts
+
+Dietary Analysis Project (3 parts)
+
+-   Part I (10 pts)
+-   Part II (170 pts)
+-   Part III (60 pts)
+
+240 pts
+
+Final Exam
+
+200 pts
+
+**TOTAL**
+
+**1000 points**f all work and my responses in case of an emergency
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0ODQwODg2MDJdfQ==
+eyJoaXN0b3J5IjpbMTA0NTYyNTQ2MF19
 -->
