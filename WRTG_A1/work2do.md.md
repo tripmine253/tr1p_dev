@@ -21,12 +21,13 @@
 - [ ] Definitions:  lay person friendly;  no technical jargon, unless relevant to audience and are defined.
 	- [ ] Inventory of components 
 - [ ] Instructions
-	- [ ] Graphics / Symbology / Legend
+	- [ ] Graphics, symbols, legends
+	- [ ] Warning statements
 
 
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTk5NzAxMjEyNV19
+eyJoaXN0b3J5IjpbMTcxMzE1ODcxOV19
 -->
