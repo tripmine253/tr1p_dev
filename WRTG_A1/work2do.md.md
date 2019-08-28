@@ -7,7 +7,7 @@
 ## Criteria
 
 #####  Steps:
-- [ ] - No less than 25 steps. ^[no word count minimum](No  Word-Count Minimum)
+- [ ] - No less than 25 steps. ^[Length]
 
 ##### Graphics:
 - [ ] 	-	at least 10 overall.
@@ -15,6 +15,10 @@
 - [ ] 	- borrowed gfx are APA cited
 - [ ] 	- labeled gfxs
 
+^[Length]:
+Length: There is no minimum or maximum word count. However, your instructions
+must have 25 or more steps. More information on the number of steps is provided
+below.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTc5MTk3MjA3M119
+eyJoaXN0b3J5IjpbNjg3MzE4MTM3XX0=
 -->
