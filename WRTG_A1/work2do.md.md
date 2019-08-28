@@ -14,11 +14,14 @@
 - [ ] 	-	Four graphics are original
 - [ ] 	- All graphics are labeled
 
+### Instruction Sections
+- [ ] Title Page
+- [ ] Intro
 
 
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTYwNjQ4NTkyMl19
+eyJoaXN0b3J5IjpbLTM1MzcwMDgxNF19
 -->
