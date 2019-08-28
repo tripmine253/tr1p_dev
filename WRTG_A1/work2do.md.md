@@ -1,5 +1,6 @@
 # Assignment  ' Set of Instructions' 
 
+### Resources: ^[Tech Writing Handbook]
 
 ### Assignment Checklist
 - [ ] Write set of instructions that explain: **How to accomplish a task.** ^[**Task**: In this assignment, you will write a set of instructions that explain to a user how to operate a device, how to make something, or how to accomplish a task.] 
@@ -33,5 +34,5 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTYyOTczODEzN119
+eyJoaXN0b3J5IjpbMTk1MzQwODEzMV19
 -->
