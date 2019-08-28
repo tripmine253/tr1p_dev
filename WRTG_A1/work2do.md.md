@@ -1,10 +1,10 @@
-### Task:
+# Assignment  ' Set of Instructions' 
 ##### options:
-1.	how to operate a device 
-2.	how to make something
-3.	how to accomplish a task.
+~~1.	how to operate a device~~ 
+~~2.	how to make something~~
+3.	**how to accomplish a task.**
 
-#### Criteria
+## Criteria
 
 #####  Steps:
 - [ ] - No less than 25 steps.
@@ -16,5 +16,5 @@
 - [ ] 	- labeled gfxs
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNDI4MTI1ODddfQ==
+eyJoaXN0b3J5IjpbLTU2ODQzMjddfQ==
 -->
