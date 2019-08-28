@@ -8,7 +8,10 @@ instructions:
 #### Criteria
 -	`!< 25 Steps`
 -	Graphics
-	-	
+-	-	at least 10 overall.
+-	-	4 Original gfx
+-	- borrowed gfx are APA cited
+-	
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMjk0MzczNDJdfQ==
+eyJoaXN0b3J5IjpbLTEzMjg4NDg0NjJdfQ==
 -->
