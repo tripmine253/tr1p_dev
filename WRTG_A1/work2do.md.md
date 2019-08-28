@@ -6,12 +6,15 @@ instructions:
 3.	how to accomplish a task.
 
 #### Criteria
--	`!< 25 Steps`
--	Graphics
+	Steps:
+1.	No less than 25 
+
+	Graphics:
 -	-	at least 10 overall.
 -	-	4 Original gfx
 -	- borrowed gfx are APA cited
--	
+-	- labeled gfxs
+
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEzMjg4NDg0NjJdfQ==
+eyJoaXN0b3J5IjpbMTkzNTk1MzQzN119
 -->
