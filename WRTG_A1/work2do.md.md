@@ -7,7 +7,7 @@
 ## Criteria
 
 #####  Steps:
-- [ ] - No less than 25 steps.
+- [ ] - No less than 25 steps. ^[no word count minimum](No  Word-Count Minimum)
 
 ##### Graphics:
 - [ ] 	-	at least 10 overall.
@@ -16,5 +16,5 @@
 - [ ] 	- labeled gfxs
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTU2ODQzMjddfQ==
+eyJoaXN0b3J5IjpbLTc5MTk3MjA3M119
 -->
