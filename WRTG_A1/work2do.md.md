@@ -6,6 +6,7 @@
 - [ ] No less than 25 steps.^[**Steps:** steps can be nested under other steps, and qualify as a counted step.]
 	- [ ] All steps numbered.
 	- [ ] All steps begin with an imperative verb.
+	- [ ] Equipment brand/type specified in documentation.
 - [ ] 	-	Has at least 10 graphics overall.
 	- [ ]  Borrowed graphics are APA cited.
 - [ ] 	-	Four graphics are original
@@ -17,5 +18,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyMTUxNzQ4NjldfQ==
+eyJoaXN0b3J5IjpbLTIwNjgxNjAwMTNdfQ==
 -->
