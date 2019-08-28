@@ -7,7 +7,7 @@
 ~~1.	how to operate a device~~ 
 ~~2.	how to make something~~
 - [ ] Write set of instructions that explain 
-**How to accomplish a task.** ^[Task] 
+**How to accomplish a task.** ^[**Task**: In this assignment, you will write a set of instructions that explain to a user how to operate a device, how to make something, or how to accomplish a task.] 
 
 - [ ] - No less than 25 steps.
 
@@ -19,9 +19,9 @@
 
 
 
-In this assignment, you will write a set of instructions that explain to a user how to operate a device, how to make something, or how to accomplish a task.
+
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjE0MzgxNDU0MF19
+eyJoaXN0b3J5IjpbLTE1NTQxNDEyMTBdfQ==
 -->
