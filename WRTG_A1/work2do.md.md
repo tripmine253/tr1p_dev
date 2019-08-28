@@ -2,7 +2,7 @@
 
 ### Resources: 
 
-^[]([Technical Writing Handbook](https://www.dozuki.com/tech_writing/chapter-a)
+[Technical Writing Handbook](https://www.dozuki.com/tech_writing/chapter-a)
 
 
 
@@ -38,5 +38,5 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MTkyNzM2MzhdfQ==
+eyJoaXN0b3J5IjpbNzM0OTY1MDU4LC0xNzE5MjczNjM4XX0=
 -->
