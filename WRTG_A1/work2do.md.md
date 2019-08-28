@@ -18,12 +18,13 @@
 - [ ] Title Page
 - [ ] Introduction, background, relevance, context, etc.
 - [ ] Prerequisite materials/equipment.
-- [ ] Defin 
+- [ ] Definitions: written with non-technical lay person 
+	- [ ] Inventory of components 
 
 
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTcyMTkzNzE4OV19
+eyJoaXN0b3J5IjpbODkwODU0MTQ4XX0=
 -->
