@@ -15,10 +15,8 @@
 - [ ] 	- borrowed gfx are APA cited
 - [ ] 	- labeled gfxs
 
-^[Length]:
-Length: There is no minimum or maximum word count. However, your instructions
-must have 25 or more steps. More information on the number of steps is provided
-below.
+^[Length] **Length**: There is no minimum or maximum word count. However, your instructions must have 25 or more steps.
+
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjg3MzE4MTM3XX0=
+eyJoaXN0b3J5IjpbNjAxNzM1NjgxXX0=
 -->
