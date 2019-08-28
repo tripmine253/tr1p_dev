@@ -4,6 +4,8 @@
 ### Assignment Checklist
 - [ ] Write set of instructions that explain: **How to accomplish a task.** ^[**Task**: In this assignment, you will write a set of instructions that explain to a user how to operate a device, how to make something, or how to accomplish a task.] 
 - [ ] No less than 25 steps.^[**Steps:** steps can be nested under other steps, and qualify as a counted step.]
+	- [ ] All steps numbered.
+	- [ ] All steps begin with an imperative verb
 - [ ] 	-	Has at least 10 graphics overall.
 	- [ ]  Borrowed graphics are APA cited.
 - [ ] 	-	Four graphics are original
@@ -15,5 +17,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODUwOTg2NzhdfQ==
+eyJoaXN0b3J5IjpbLTE1MjM3MTcxMjddfQ==
 -->
