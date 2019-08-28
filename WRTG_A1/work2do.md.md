@@ -8,7 +8,7 @@
 	- [ ] All steps begin with an imperative verb.
 	- [ ] Task instructions are not generalized
 		- [ ] Equipment brand/type specified in documentation.
-		- [ ] 
+		- [ ] Instructions reflect accurately by make/model.
 - [ ] 	-	Has at least 10 graphics overall.
 	- [ ]  Borrowed graphics are APA cited.
 - [ ] 	-	Four graphics are original
@@ -20,5 +20,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ5MDUwNDMyMF19
+eyJoaXN0b3J5IjpbMTYwNjQ4NTkyMl19
 -->
