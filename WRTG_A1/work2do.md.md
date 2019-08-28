@@ -10,9 +10,9 @@
 
 - [ ] No less than 25 steps.
 - [ ] 	-	Has at least 10 graphics overall.
-- [ ] 	-	4 graphics are original
-- [ ] 	- borrowed gfx are APA cited
-- [ ] 	- labeled gfxs
+	- [ ]  Borrowed graphics are APA cited.
+- [ ] 	-	Four graphics are original
+- [ ] 	- All graphics are labeled
 
 
 
@@ -20,5 +20,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMjAwMjExNzRdfQ==
+eyJoaXN0b3J5IjpbLTE2NTc5MDQ1NzFdfQ==
 -->
