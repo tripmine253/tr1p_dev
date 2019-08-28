@@ -16,12 +16,14 @@
 
 ### Instruction Sections
 - [ ] Title Page
-- [ ] Intro
+- [ ] Introduction, background, relevance, context, etc.
+- [ ] Prerequisite materials/equipment.
+- [ ] Defin 
 
 
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTM1MzcwMDgxNF19
+eyJoaXN0b3J5IjpbLTcyMTkzNzE4OV19
 -->
