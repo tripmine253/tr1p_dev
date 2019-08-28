@@ -18,13 +18,15 @@
 - [ ] Title Page
 - [ ] Introduction, background, relevance, context, etc.
 - [ ] Prerequisite materials/equipment.
-- [ ] Definitions:  lay person friendly;  no technical jargon, unless relevant to audience and are d
+- [ ] Definitions:  lay person friendly;  no technical jargon, unless relevant to audience and are defined.
 	- [ ] Inventory of components 
+- [ ] Instructions
+	- [ ] Graphics / Symbology / Legend
 
 
 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE0MTQ4Mzk3OF19
+eyJoaXN0b3J5IjpbLTk5NzAxMjEyNV19
 -->
