@@ -15,6 +15,10 @@
 - [ ] 	- All graphics are labeled
 
 ### Instruction Sections
+>Overall, chapter 10 from Tebeaux and Dragga should be read thoroughly as you begin this
+assignment. Different types of instructions call for different strategies. The chapter from
+Tebeaux and Dragga is an excellent resource in guiding your approach.
+
 - [ ] Title Page
 - [ ] Introduction, background, relevance, context, etc.
 - [ ] Prerequisite materials/equipment.
@@ -29,5 +33,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTcxMzE1ODcxOV19
+eyJoaXN0b3J5IjpbLTYyOTczODEzN119
 -->
