@@ -18,7 +18,7 @@
 - [ ] Title Page
 - [ ] Introduction, background, relevance, context, etc.
 - [ ] Prerequisite materials/equipment.
-- [ ] Definitions: written with non-technical lay person 
+- [ ] Definitions:  lay person friendly;  no technical jargon, unless relevant to audience and are d
 	- [ ] Inventory of components 
 
 
@@ -26,5 +26,5 @@
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODkwODU0MTQ4XX0=
+eyJoaXN0b3J5IjpbMTE0MTQ4Mzk3OF19
 -->
