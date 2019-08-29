@@ -5,8 +5,11 @@
 [Technical Writing Handbook](https://www.dozuki.com/tech_writing/chapter-a)
 
 |Document Design|	excellent |good |fair| needs improvement| not passing
-|--|--|--|--|--|--|
+|:--|--|--|--|--|--|
 |is single-spaced|2 points|1.6 points|1.4 points|1.2 points|0 points|/ 2|
+|has a sufficient amount of white space to allow for easy navigation|2 points|1.6 points|1.4 points|1.2 points|0 points|/ 2|
+**Technical description**	|--|--|--|--|--|
+|introduces or defines the object or process to a lay audience|10 points|8 points|7 points|6 points|5 points|/ 10|
 
 
 ### Assignment Checklist
@@ -41,6 +44,6 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTgxNzA5MzM5OSw3MzQ5NjUwNTgsLTE3MT
-kyNzM2MzhdfQ==
+eyJoaXN0b3J5IjpbLTE3MDUwMzkxMTYsMTgxNzA5MzM5OSw3Mz
+Q5NjUwNTgsLTE3MTkyNzM2MzhdfQ==
 -->
