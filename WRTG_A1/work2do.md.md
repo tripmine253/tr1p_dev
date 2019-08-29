@@ -8,7 +8,7 @@
 |:--|--|--|--|--|--|
 |is single-spaced|2 points|1.6 points|1.4 points|1.2 points|0 points|/ 2|
 |has a sufficient amount of white space to allow for easy navigation|2 points|1.6 points|1.4 points|1.2 points|0 points|/ 2|
-**Technical description**	|--|--|--|--|--|
+**Technical description**	||||||
 |introduces or defines the object or process to a lay audience|10 points|8 points|7 points|6 points|5 points|/ 10|
 
 
@@ -44,6 +44,6 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MDUwMzkxMTYsMTgxNzA5MzM5OSw3Mz
-Q5NjUwNTgsLTE3MTkyNzM2MzhdfQ==
+eyJoaXN0b3J5IjpbMjA2NTgyODYyOCwxODE3MDkzMzk5LDczND
+k2NTA1OCwtMTcxOTI3MzYzOF19
 -->
