@@ -4,6 +4,9 @@
 
 [Technical Writing Handbook](https://www.dozuki.com/tech_writing/chapter-a)
 
+|Document Design|	excellent |good |fair| needs improvement| not passing
+|--|--|--|--|--|--|
+|is single-spaced|2 points|1.6 points|1.4 points|1.2 points|0 points|/ 2|
 
 
 ### Assignment Checklist
@@ -38,5 +41,6 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzM0OTY1MDU4LC0xNzE5MjczNjM4XX0=
+eyJoaXN0b3J5IjpbMTgxNzA5MzM5OSw3MzQ5NjUwNTgsLTE3MT
+kyNzM2MzhdfQ==
 -->
