@@ -1,3 +1,6 @@
+
+for x in *;do ffmpeg -i "$x" -r 1/1 ${x}%03d.jpeg;done
+
 # Assignment  ' Set of Instructions' 
 
 ### Resources: 
@@ -44,6 +47,6 @@ Tebeaux and Dragga is an excellent resource in guiding your approach.
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA2NTgyODYyOCwxODE3MDkzMzk5LDczND
-k2NTA1OCwtMTcxOTI3MzYzOF19
+eyJoaXN0b3J5IjpbLTEzOTczMDk4ODIsMjA2NTgyODYyOCwxOD
+E3MDkzMzk5LDczNDk2NTA1OCwtMTcxOTI3MzYzOF19
 -->
