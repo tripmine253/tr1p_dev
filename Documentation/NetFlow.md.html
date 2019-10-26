@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetFlow.md</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="cisco-routers">CISCO Routers</h1>
+<h2 id="configuring-the-flow-exporter-">Configuring the Flow Exporter <sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup></h2>
+<h3 id="summary-steps">Summary Steps</h3>
+<ol>
+<li>enable</li>
+<li>configure terminal</li>
+<li>flow exporter exporter-name</li>
+<li>description description</li>
+<li>destination {ip-address |  hostname } [vrf vrf-name ]</li>
+<li>dscp dscp</li>
+<li>source interface-type interface-number</li>
+<li>output-features</li>
+<li>template data timeout seconds</li>
+<li>transport udp udp-port</li>
+<li>ttl seconds</li>
+<li>end</li>
+<li>show flow exporter exporter-name</li>
+<li>show running-config flow exporter exporter-name</li>
+</ol>
+<h4 id="steps-35710-flow-exporter">STEPS 3,5,7,10 FLOW-EXPORTER</h4>
+<pre><code>flow exporter NTAexport
+destination &lt;SOLARWINDS IP ADDRESS&gt;
+source loopback 0
+transport udp 2055
+</code></pre>
+<p>NOTE:  Needs to have an IP Address since we listen by IP address with the collector on the Solarwinds server.</p>
+<h2 id="configuring-custom-netflow-record">Configuring Custom Netflow Record<sup class="footnote-ref"><a href="#fn2" id="fnref2">2</a></sup></h2>
+<h4 id="summary-steps-1"><strong>SUMMARY STEPS</strong></h4>
+<p><strong>1.</strong> enable<br>
+<strong>2.</strong> configure terminal<br>
+<strong>3.</strong> flow  record record-name<br>
+<strong>4.</strong> description description<br>
+<strong>5.</strong> match {ipv4  |  ipv6}{destination  |  source}  address<br>
+<strong>6.</strong> Repeat Step 5 as required to configure additional key fields for the record.<br>
+<strong>7.</strong> collect interface {input  |  output}<br>
+<strong>8.</strong> Repeat Step 7 as required to configure additional nonkey fields for the record.<br>
+<strong>9.</strong> end<br>
+<strong>10.</strong> show  flow  record record-name<br>
+<strong>11.</strong> show  running-config  flow  record record-name</p>
+<h4 id="steps-1-5-input-record">STEPS 1-5 <em>INPUT-RECORD</em></h4>
+<pre><code>flow record NETFLOW-RECORD-IN
+match ipv4 tos
+match ipv4 protocol
+match ipv4 source address
+match ipv4 destination address
+match transport source-port
+match transport destination-port
+match interface input
+match flow direction
+</code></pre>
+<h4 id="steps-7-8-input-record">STEPS 7-8 <em>INPUT-RECORD</em></h4>
+<pre><code>collect transport tcp flags
+collect interface output
+collect counter bytes long
+collect counter packets long
+collect timestamp absolute first
+collect timestamp absolute last
+collect counter bytes layer2 long
+</code></pre>
+<h4 id="steps-1-5-repeated-for-output-record">STEPS 1-5 <em>REPEATED FOR OUTPUT-RECORD</em></h4>
+<pre><code>flow record NETFLOW-RECORD-OUT
+match ipv4 tos
+match ipv4 protocol
+match ipv4 source address
+match ipv4 destination address
+match transport source-port
+match transport destination-port
+match interface input
+match flow direction
+</code></pre>
+<h4 id="steps-7-8-repeated-for-output-record">STEPS 7-8 <em>REPEATED FOR OUTPUT-RECORD</em></h4>
+<pre><code>collect transport tcp flags
+collect interface output
+collect counter bytes long
+collect counter packets long
+collect timestamp absolute first
+collect timestamp absolute last
+collect counter bytes layer2 long
+</code></pre>
+<h2 id="creating-a-customized-flow-monitor-">Creating a Customized Flow Monitor <sup class="footnote-ref"><a href="#fn3" id="fnref3">3</a></sup></h2>
+<h4 id="summary-steps-2"><strong>SUMMARY STEPS</strong></h4>
+<p><strong>1.</strong> enable<br>
+<strong>2.</strong> configure terminal<br>
+<strong>3.</strong> flow monitor <em>monitor-name</em><br>
+<strong>4.</strong> description <em>description</em><br>
+<strong>5.</strong> record {<em>record-name</em>  |  <strong>netflow-original</strong>  |  <strong>netflow</strong>  {<strong>ipv4</strong>  |  <strong>ipv6</strong>}  <em>record</em>  [peer]}<br>
+<strong>6.</strong> <strong>cache</strong> {<strong>entries</strong>  <em>number</em>  |  <strong>timeout</strong>  {<strong>active</strong>  |  <strong>inactive</strong>  |  <strong>update</strong>}  <em>seconds</em>  |  <strong>type</strong>  {<strong>immediate</strong>  |  <strong>normal</strong>  |  <strong>permanent</strong>}}<br>
+<strong>7.</strong> Repeat Step 6 as required to finish modifying the cache parameters for this flow monitor.<br>
+<strong>8.</strong> <strong>statistics packet protocol</strong><br>
+<strong>9.</strong> <strong>statistics  packet size</strong><br>
+<strong>10.</strong> <strong>exporter</strong> exporter-name<br>
+<strong>11.</strong> <strong>end</strong><br>
+<strong>12.</strong> <strong>show  flow  monitor</strong> [[<strong>name</strong>]  <em>monitor-name</em>  [<strong>cache</strong>  [<strong>format</strong>  {<strong>csv</strong>  |  <strong>record</strong>  |  <strong>table</strong>}]] [<strong>statistics</strong>]]<br>
+<strong>13.</strong> <strong>show  running-config  flow  monitor</strong> <em>monitor-name</em></p>
+<h4 id="steps-356-monitor-in">STEPS 3,5,6 MONITOR-IN</h4>
+<pre><code>flow monitor NETFLOW-MON-IN
+record NETFLOW-RECORD-IN
+cache timeout active 60
+exporter NTAexport
+</code></pre>
+<h4 id="steps-356-monitor-out">STEPS 3,5,6 MONITOR-OUT</h4>
+<pre><code>flow monitor NETFLOW-MON-OUT
+record NETFLOW-RECORD-OUT
+exporter NTAexport
+cache timeout active 60
+</code></pre>
+<blockquote>
+<p>After the Netflow configuration is setup, you can now assign the monitors to<br>
+the interface you want to monitor Netflow on.<br>
+Example:</p>
+</blockquote>
+<pre><code>Router# configure terminal
+Router (config) # int tunnel 95725
+Router (config) # ip flow monitor NETFLOW-MON-IN input
+Router (config) # ip flow monitor NETFLOW-MON-OUT output
+</code></pre>
+<p>CREDIT TO CW2 Navarro for the extra notes</p>
+<blockquote>
+<p>###################################3<br>
+When it comes to the netflow analyzer:</p>
+<ol>
+<li>Add the node by loopback 0</li>
+<li>I am using SNMPv3 information</li>
+<li>Then go to the netflow side and manage it, I select all cisco<br>
+nodes.</li>
+</ol>
+<p>I am still tweaking my reports page but it is publishing For the<br>
+firewall I had to build a rule for the WAN to Management for the<br>
+destination of my server to allow netflow. I was getting 2055 blocks<br>
+on the monitor initially.</p>
+<p>-Ray</p>
+<p>Raymond Navarro CW2, SC Network Technician (255N) 11th Signal Brigade,<br>
+Fort Hood Texas Cell: 915-303-4595 NOC: 254-287-5003</p>
+</blockquote>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/fnetflow/configuration/15-mt/fnf-15-mt-book/fnf-output-features.html">Documentation - Creating Flow Exporter</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/fnetflow/configuration/15-mt/fnf-15-mt-book/cust-fnflow-rec-mon.html#GUID-53C0CD0E-BC99-4FE4-80AA-E07C6867DFAA">Documentation - Creating Custom Netflow Record</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/fnetflow/configuration/15-mt/fnf-15-mt-book/cust-fnflow-rec-mon.html#GUID-AD7DFC68-9B6C-4C9E-B851-66C95B149C2F">Documentation - Creating Custom Netflow Monitor</a> <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div>
+</body>
+
+</html>

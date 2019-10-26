@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Endianness.md</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><dl>
+<dt><a href="https://betterexplained.com/articles/understanding-big-and-little-endian-byte-order/">Byte Ordering</a></dt>
+<dd>Transmission Ordering of bits over a medium</dd>
+<dt><a href="https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_byte">Bit Numbering</a></dt>
+<dd>Identification of bit positions in a binary number</dd>
+<dt><a href="%5Bhttp://www.xcprod.com/titan/XCSB-DOC/bit_numbers.html%5Dhttp://www.xcprod.com/titan/XCSB-DOC/bit_numbers.html">Bit Numbers</a></dt>
+<dd>right to left</dd>
+<dd>left to right</dd>
+</dl>
+<ul>
+<li>
+<p>Least Significant Bit (LSB)</p>
+<ul>
+<li>Also refered to as: <em><strong>low-order-bit</strong></em> or <em><strong>right-most-bit</strong></em></li>
+<li>abbreviated: <strong>lsbit</strong> and <strong>lsbyte</strong><br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Lsb0.svg/300px-Lsb0.svg.png" alt="LSB"></li>
+</ul>
+</li>
+<li>
+<p>Most Significant Bit (MSB)</p>
+<ul>
+<li>Also referred to as:	<em><strong>high-order-bit</strong></em> or <em><strong>left-most-bit</strong></em></li>
+<li>Most significant bit will arrive first <code>0x12</code>, <code>00000010</code></li>
+<li><strong>0 0 0 1 0 0 1 0</strong></li>
+<li>abbv: <strong>MSbit</strong> and <strong>MSbyte</strong></li>
+<li>Determines the sign of the number – sometimes called the <a href="https://en.wikipedia.org/wiki/Sign_bit">sign-bit</a><br>
+<sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup><br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Msb0.svg/300px-Msb0.svg.png" alt="enter image description here"></li>
+</ul>
+</li>
+</ul>
+<p><mark><a href="https://en.wikipedia.org/wiki/Signed_number_representations">Signed numbers</a></mark> and 	<mark><a href="https://en.wikipedia.org/wiki/Two%27s_complement#Why_it_works">why it works</a></mark></p>
+<h3 id="endianness">Endianness<sup class="footnote-ref"><a href="#fn2" id="fnref2">2</a></sup></h3>
+<p><strong>little-endian</strong><br>
+-  least significant byte first and most significant byte last<br>
+- dominant processing order, x86, AMD64/x86-64 and most ARM<br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Little-Endian.svg/200px-Little-Endian.svg.png" alt="Little-Endian"></p>
+<p><strong>big-endian</strong><br>
+- most significant byte first and least significant byte last<br>
+- dominant processing order in networking protocols (IP, TCP, UDP)<br>
+<em><strong>network order</strong></em>  - <em><strong>network byte order</strong></em> – <em><strong>big-endian byte order</strong></em> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Big-Endian.svg/200px-Big-Endian.svg.png" alt="Big-Endian"></p>
+
+<table>
+<thead>
+<tr>
+<th>unsigned hexadecimal</th>
+<th>little-endian ordering</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0x1234</code></td>
+<td><code>0x34, 0x12</code></td>
+</tr>
+</tbody>
+</table><ul>
+<li>File Formats - 	can use either, and occasionally mix the two.</li>
+</ul>
+<h3 id="formatting-for-endianness">Formatting for Endianness</h3>
+<p>Perl:</p>
+<ul>
+<li>pack()
+<ul>
+<li><a href="https://perldoc.perl.org/functions/pack.html"><em>Extremely good explanation</em></a></li>
+</ul>
+</li>
+</ul>
+<p>Python:</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/struct.html#struct.Struct">struct</a>
+<ul>
+<li><a href="https://docs.python.org/3/library/struct.html#struct.Struct#struct.Struct">struct.Struct</a></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>module performs conversions between Python values and C structs represented as Python <a href="https://docs.python.org/3/library/stdtypes.html#bytes" title="bytes"><code>bytes</code></a> objects.</p>
+</blockquote>
+<p><strong>Note:</strong> <em>All examples assume a native byte order, size, and alignment with a big-endian machine.</em></p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token keyword">from</span> struct <span class="token keyword">import</span> <span class="token operator">*</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token comment"># 'h' 'h' 'l' represent integer format types</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token comment"># 'h' == short "Standard Size of 2"</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> <span class="token comment"># 'l' == long "Standard Size of 4"</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> pack<span class="token punctuation">(</span><span class="token string">'hhl'</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+b<span class="token string">'\x00\x01\x00\x02\x00\x00\x00\x03'</span>
+</code></pre>
+<p>Null byte padding added to the left<code>\x00 + \x01</code> of the first value<br>
+\x00\x01 + \x00 &lt;- padding + \x02<br>
+\x00\x01\x00\x02 + \x00\x00\x00 &lt;- padding + \x03</p>
+<pre class=" language-python"><code class="prism  language-python">
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> unpack<span class="token punctuation">(</span><span class="token string">'hhl'</span><span class="token punctuation">,</span> b<span class="token string">'\x00\x01\x00\x02\x00\x00\x00\x03'</span><span class="token punctuation">)</span>
+<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+<span class="token operator">&gt;&gt;</span><span class="token operator">&gt;</span> calcsize<span class="token punctuation">(</span><span class="token string">'hhl'</span><span class="token punctuation">)</span>
+<span class="token number">8</span>
+</code></pre>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>state determines whether odd or even, if the sign bit is 1 then the number is negative<br>
+<a href="https://en.wikipedia.org/wiki/Signed_number_representations#Signed_magnitude_representation">sign and magnatude - more correctly</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Least/Most significant bit ordering <a href="%5Bhttps://en.wikipedia.org/wiki/Endianness%5D(https://en.wikipedia.org/wiki/Endianness)">wiki/Endianness</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+</div>
+</body>
+
+</html>

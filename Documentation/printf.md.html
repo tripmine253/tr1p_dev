@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>printf.md</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="format-string-vulnerability">Format String Vulnerability</h1>
+<h1 id="printf--user-input-">printf ( user input );</h1>
+<p>The above statement is quite common in C programs. In the lecture, we will find out what can go wrong<br>
+if the program is running with privileges (e.g.Set-UIDprogram).</p>
+<h2 id="format-string">1 Format String</h2>
+<ul>
+<li>What is a format string?</li>
+</ul>
+<pre><code>printf ("The magic number is: %d\n", 1911);
+</code></pre>
+<p>The text to be printed is “The magic number is:”, followed by a format parameter ‘%d’, which is<br>
+replaced with the parameter (1911) in the output. Therefore the output looks like: The magic number<br>
+is: 1911. In addition to %d, there are several other format parameters, each having different meaning.<br>
+The following table summarizes these format parameters:</p>
+<pre><code>Parameter Meaning Passed as
+-------------------------------------------------------------------
+
+%c character
+%d decimal (integer) number (base 10)
+%e exponential floating-point number
+%f floating-point number
+%i integer (base 10)
+%n number of bytes written so far, (* int) reference
+%o octal number (base 8)
+%s string ((const) (unsigned) char *) reference
+%u unsigned decimal (unsigned int) value
+%x hexadecimal (unsigned int) value
+%% print a percent sign
+\% print a percent sign
+</code></pre>
+<ul>
+<li>The stack and its role at format strings<br>
+The behavior of the format function is controlled by the format string. The function retrieves the<br>
+parameters requested by the format string from the stack.</li>
+</ul>
+<pre><code>printf ("a has value %d, b has value %d, c is at address: %08x\n",
+a, b, &amp;c);
+</code></pre>
+<pre><code>Adress of cValue of bValue of aAddress of Format String
+</code></pre>
+<pre><code>printf()’s internal
+pointer
+</code></pre>
+<pre><code>Moving in this direction
+</code></pre>
+<pre><code>Stack Stack grows in this direction
+</code></pre>
+<ul>
+<li>What if there is a miss-match between the format string and the actual arguments?</li>
+</ul>
+<pre><code>printf ("a has value %d, b has value %d, c is at address: %08x\n",
+a, b);
+</code></pre>
+<ul>
+<li>In the above example, the format string asks for 3 arguments, but the program actually provides<br>
+only two (i.e.aandb).</li>
+<li>Can this program pass the compiler?<br>
+∗ The functionprintf()is defined as function with variable length of arguments. There-<br>
+fore, by looking at the number of arguments, everything looks fine.<br>
+∗ To find the miss-match, compilers needs to understand howprintf()works and what the<br>
+meaning of the format string is. However, compilers usually do not do this kind of analysis.<br>
+∗ Sometimes, the format string is not a constant string, it is generated during the execution of<br>
+the program. Therefore, there is no way for the compiler to find the miss-match in this case.</li>
+<li>Canprintf()detect the miss-match?<br>
+∗ The functionprintf()fetches the arguments from the stack. If the format string needs<br>
+3 arguments, it will fetch 3 data items from the stack. Unless the stack is marked with a<br>
+boundary,printf()does not know that it runs out of the arguments that are provided to<br>
+it.<br>
+∗ Since there is no such a marking.printf()will continue fetching data from the stack.<br>
+In a miss-match case, it will fetch some data that do not belong to this function call.</li>
+<li>What trouble can be caused byprintf()when it starts to fetch data that is meant for it?</li>
+</ul>
+<h2 id="attacks-on-format-string-vulnerability">2 Attacks on Format String Vulnerability</h2>
+<ul>
+<li>Crashing the program</li>
+</ul>
+<pre><code>printf ("%s%s%s%s%s%s%s%s%s%s%s%s");
+</code></pre>
+<ul>
+<li>For each%s,printf()will fetch a number from the stack, treat this number as an address,<br>
+and print out the memory contents pointed by this address as a string, until a NULL character<br>
+(i.e., number 0, not character 0) is encountered.</li>
+<li>Since the number fetched byprintf()might not be an address, the memory pointed by this<br>
+number might not exist (i.e. no physical memory has been assigned to such an address), and the<br>
+program will crash.</li>
+<li>It is also possible that the number happens to be a good address, but the address space is protected<br>
+(e.g. it is reserved for kernel memory). In this case, the program will also crash.</li>
+<li>Viewing the stack</li>
+</ul>
+<pre><code>printf ("%08x %08x %08x %08x %08x\n");
+</code></pre>
+<ul>
+<li>This instructs the printf-function to retrieve five parameters from the stack and display them as<br>
+8-digit padded hexadecimal numbers. So a possible output may look like:<br>
+40012980 080628c4 bffff7a4 00000005 08059c</li>
+<li>Viewing memory at any location</li>
+<li>We have to supply an address of the memory. However, we cannot change the code; we can only<br>
+supply the format string.</li>
+<li>If we useprintf(%s)without specifying a memory address, the target address will be ob-<br>
+tained from the stack anyway by theprintf()function. The function maintains an initial<br>
+stack pointer, so it knows the location of the parameters in the stack.</li>
+<li>Observation: the format string is usually located on the stack. If we can encode the target address<br>
+in the format string, the target address will be in the stack. In the following example, the format<br>
+string is stored in a buffer, which is located on the stack.<br>
+int main(int argc, char <em>argv[])<br>
+{<br>
+char user_input[100];<br>
+… … /</em> other variable definitions and statements */</li>
+</ul>
+<pre><code>scanf("%s", user_input); /* getting a string from user */
+printf(user_input); /* Vulnerable place */
+</code></pre>
+<pre><code>return 0;
+}
+</code></pre>
+<ul>
+<li>
+<p>If we can force the printf to obtain the address from the format string (also on the stack), we can<br>
+control the address.<br>
+printf ("\x10\x01\x48\x08 %x %x %x %x %s");</p>
+</li>
+<li>
+<p>\x10\x01\x48\x08are the four bytes of the target address. In C language,\x10in a string<br>
+tells the compiler to put a hexadecimal value0x10in the current position. The value will take<br>
+up just one byte. Without using\x, if we directly put"10"in a string, the ASCII values of the<br>
+characters’1’and’0’will be stored. Their ASCII values are 49 and 48 , respectively.</p>
+</li>
+<li>
+<p>%xcauses the stack pointer to move towards the format string.</p>
+</li>
+<li>
+<p>Here is how the attack works ifuserinput[]contains the following format string:<br>
+“\x10\x01\x48\x08 %x %x %x %x %s”.</p>
+</li>
+</ul>
+<pre><code>Address of user_input [ ]
+</code></pre>
+<pre><code>0x
+</code></pre>
+<pre><code>user_input [ ]
+</code></pre>
+<pre><code>%s %x %x %x %x
+</code></pre>
+<pre><code>Print this
+for the 1st %x
+</code></pre>
+<pre><code>Print this
+for the 4th %x
+For %s: print out the contents pointed by this address
+</code></pre>
+<p>Print out the contents at the address 0x10014808 using format-string vlunerability</p>
+<ul>
+<li>
+<p>Basically, we use four%xto move theprintf()’s pointer towards the address that we stored<br>
+in the format string. Once we reach the destination, we will give%stoprint(), causing it<br>
+to print out the contents in the memory address0x10014808. The functionprintf()will<br>
+treat the contents as a string, and print out the string until reaching the end of the string (i.e. 0).</p>
+</li>
+<li>
+<p>The stack space betweenuserinput[]and the address passed to theprintf()function<br>
+is not forprintf(). However, because of the format-string vulnerability in the program,<br>
+printf()considers them as the arguments to match with the%xin the format string.</p>
+</li>
+<li>
+<p>The key challenge in this attack is to figure out the distance between theuserinput[]and<br>
+the address passed to theprintf()function. This distance decides how many%xyou need to<br>
+insert into the format string, before giving%s.</p>
+</li>
+<li>
+<p>Writing an integer to nearly any location in the process memory</p>
+</li>
+<li>
+<p>%n: The number of characters written so far is stored into the integer indicated by the corre-<br>
+sponding argument.<br>
+int i;<br>
+printf (“12345%n”, &amp;i);</p>
+</li>
+<li>
+<p>It causesprintf()to write 5 into variablei.</p>
+</li>
+<li>
+<p>Using the same approach as that for viewing memory at any location, we can causeprintf()<br>
+to write an integer into any location. Just replace the%sin the above example with%n, and the<br>
+contents at the address0x10014808will be overwritten.</p>
+</li>
+<li>
+<p>Using this attack, attackers can do the following:<br>
+∗ Overwrite important program flags that control access privileges<br>
+∗ Overwrite return addresses on the stack, function pointers, etc.</p>
+</li>
+<li>
+<p>However, the value written is determined by the number of characters printed before the%nis<br>
+reached. Is it really possible to write arbitrary integer values?<br>
+∗ Use dummy output characters. To write a value of 1000, a simple padding of 1000 dummy<br>
+characters would do.<br>
+∗ To avoid long format strings, we can use a width specification of the format indicators.</p>
+</li>
+<li>
+<p>Countermeasures.</p>
+</li>
+<li>
+<p>Address randomization: just like the countermeasures used to protect against buffer-overflow<br>
+attacks, address randomization makes it difficult for the attackers to find out what address they<br>
+want to read/write.</p>
+</li>
+</ul>
+<h2 id="exploiting-format-string-vulnerabilities">Exploiting Format String Vulnerabilities</h2>
+<pre><code>     - September 1, scut / team teso
+        - version 1.
+</code></pre>
+<ul>
+<li>1 Introduction Contents
+<ul>
+<li>1.1 Buffer Overflows vs. Format String Vulnerabilities</li>
+<li>1.2 Statistics: important format string vulnerabilities in</li>
+</ul>
+</li>
+<li>2 The format functions
+<ul>
+<li>2.1 How does a format string vulnerability look like ?.</li>
+<li>2.2 The format function family</li>
+<li>2.3 Use of format functions</li>
+<li>2.4 What exactly is a format string ?.</li>
+<li>2.5 The stack and its role at format strings</li>
+</ul>
+</li>
+<li>3 Format string vulnerabilities
+<ul>
+<li>3.1 What do we control now ?.</li>
+<li>3.2 Crash of the program</li>
+<li>3.3 Viewing the process memory
+<ul>
+<li>3.3.1 Viewing the stack</li>
+<li>3.3.2 Viewing memory at any location</li>
+</ul>
+</li>
+<li>3.4 Overwriting of arbitrary memory
+<ul>
+<li>3.4.1 Exploitation - similar to common buffer overflows.</li>
+<li>3.4.2 Exploitation - through pure format strings.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>4 Variations of Exploitation
+<ul>
+<li>4.1 Short Write</li>
+<li>4.2 Stack Popping</li>
+<li>4.3 Direct Parameter Access.</li>
+</ul>
+</li>
+<li>5 Brute Forcing
+<ul>
+<li>5.1 Response Based Brute Force.</li>
+<li>5.2 Blind Brute Forcing</li>
+</ul>
+</li>
+</ul>
+<h5 id="introduction">2 1 INTRODUCTION</h5>
+<pre><code>6 Special Cases 23
+6.1 Alternative targets........................ 23
+6.1.1 GOT overwrite...................... 24
+6.1.2 DTORS.......................... 25
+6.1.3 C library hooks...................... 25
+6.1.4 atexit structures.................... 25
+6.1.5 function pointers..................... 25
+6.1.6 jmpbuf’s.......................... 26
+6.2 Return into LibC......................... 26
+6.3 Multiple Print........................... 26
+6.4 Format string within the Heap................. 27
+6.5 Special considerations...................... 28
+</code></pre>
+<pre><code>7 Tools 29
+7.1 ltrace, strace........................... 29
+7.2 GDB, objdump.......................... 29
+</code></pre>
+<h2 id="introduction-contents">1 Introduction Contents</h2>
+<pre><code>This article explains the nature of a phenomenon that has shocked the secu-
+rity community in the second half of the year 2000. Known as ‘format string
+vulnerabilities’, a whole new class of vulnerabilities has been disclosed and
+caused a wave of exploitable bugs being discovered in all kinds of programs,
+ranging from small utilities to big server applications.
+The article will try to explain the structure of the vulnerability and later
+use this knowledge to build sophisticated exploits. It will show you how to
+discover format string vulnerabilities in C source code, and why this new
+kind of vulnerability is more dangerous than the common buffer overflow
+vulnerability.
+The article is based on a german speech I gave at the17th Chaos Commu-
+nication Congress[ 2 ] in Berlin, Germany. After the speech I got numerous
+requests to translate it and received a lot of positive feedback. All this mo-
+tivated me to revise the document, update and correct details and to do a
+more useable LATEX version of it.
+This article covers most of the things mentioned in other articles, plus
+a few more tricks and twirks when it comes to exploitation. It is up to
+date yet, and feedback is welcome. So after you have read it please send me
+feedback, ideas and anything else non-harassive to scut@team-teso.net.
+The first part of the article deals with the history and awareness of format
+string vulnerabilities, followed by details how to discover and avoid such
+vulnerabilities in source code. Then some basic techniques are developed
+to play with this vulnerabilities, from which a mighty exploitation method
+arises. This method is then modified, improved and practically applied for
+</code></pre>
+<p>1.1 Buffer Overflows vs. Format String Vulnerabilities 3</p>
+<p>special situations to allow you to exploit nearly any kind of format string<br>
+vulnerability seen until today.</p>
+<p>As with every vulnerability it was developed over time, and new tech-<br>
+niques have shown up, often because old ones did not work in a certain<br>
+situation. People, who truly deserve credit for a lot of techniques men-<br>
+tioned in this articles and have influenced my writing significantly aretf8,<br>
+who wrote the first format string exploit ever,portal, who developed and<br>
+researched exploitability in his excellent article [ 3 ],DiGiT, who found most<br>
+of the critical remote format string vulnerabilities known today, andsmiler,<br>
+who developed sophisticated brute force techniques.</p>
+<p>Although I have contributed some tricks too, without the giant help,<br>
+comments and tricks - both theoretically or in form of an exploit - shown to<br>
+me by this people, this article would not have been possible. Thanks. I also<br>
+thank the numerous individuals who commented, reviewed and improved<br>
+this article.</p>
+<p>Updated and corrected versions may appear on the TESO Security Group<br>
+homepage [ 1 ].</p>
+<h3 id="buffer-overflows-vs.-format-string-vulnerabilities">1.1 Buffer Overflows vs. Format String Vulnerabilities</h3>
+<p>Since nearly all critical vulnerabilities in the past were some kind of buffer<br>
+overflows, one could compare such a serious and low level vulnerability to<br>
+this new type of vulnerabilities.</p>
+<pre><code>Buffer Overflow Format String
+public since mid 1980’s June 1999
+danger realized 1990’s June 2000
+number of exploits a few thousand a few dozen
+considered as security threat programming bug
+techniques evolved and advanced basic techniques
+visibility sometimes very difficult to spot easy to find
+</code></pre>
+<h3 id="statistics-important-format-string-vulnerabilities-in">1.2 Statistics: important format string vulnerabilities in</h3>
+<p>To underline the dangerous impact format string vulnerabilities had for the<br>
+year 2000, we list the most exploited publicized vulnerabilities here.</p>
+<h5 id="the-format-functions">4 2 THE FORMAT FUNCTIONS</h5>
+<pre><code>Application Found by Impact years
+wu-ftpd 2.* security.is remote root &gt; 6
+Linux rpc.statd security.is remote root &gt; 4
+IRIX telnetd LSD remote root &gt; 8
+Qualcomm Popper 2.53 security.is remote user &gt; 3
+Apache + PHP3 security.is remote user &gt; 2
+NLS / locale CORE SDI local root?
+screen Jouko Pynn ̄onen local root &gt; 5
+BSD chpass TESO local root?
+OpenBSD fstat ktwo local root?
+</code></pre>
+<p>There are still a lot of unknown or undisclosed vulnerabilities left at the<br>
+time of writing, and for the next two or three years format string vulnerabili-<br>
+ties will contribute to the statistics of new vulnerabilities that are found. As<br>
+we will see, they are easy to discover automatically with more sophisticated<br>
+tools, and you can assume that for most of the vulnerabilities in todays code<br>
+which are not yet publicly known, an exploit already exist.<br>
+There are also ways to discover this type of vulnerability in applications,<br>
+that are available as binaries only. To do this a more generic approach to<br>
+find ‘argument deficiencies’ is used and explained in detail in Halvar Flakes<br>
+excellent binary auditing speech [ 6 ].</p>
+<h2 id="the-format-functions-1">2 The format functions</h2>
+<p>A format function is a special kind of ANSI C function, that takes a variable<br>
+number of arguments, from which one is the so called format string. While<br>
+the function evaluates the format string, it accesses the extra parameters<br>
+given to the function. It is a conversion function, which is used to represent<br>
+primitive C data types in a human readable string representation. They are<br>
+used in nearly any C program, to output information, print error messages<br>
+or process strings.<br>
+In this chapter we will cover typical vulnerabilities in the usage of for-<br>
+mat functions, the correct usage, some of their parameters and the general<br>
+concept of a format string vulnerability.</p>
+<h3 id="how-does-a-format-string-vulnerability-look-like-.">2.1 How does a format string vulnerability look like ?.</h3>
+<p>If an attacker is able to provide the format string to an ANSI C format<br>
+function in part or as a whole, a format string vulnerability is present. By<br>
+doing so, the behaviour of the format function is changed, and the attacker<br>
+may get control over the target application.<br>
+In the examples below, the stringuseris supplied by the attacker — he<br>
+can control the entire ASCIIZ-string, for example through using a command<br>
+line parameter.</p>
+<p>2.2 The format function family 5</p>
+<pre><code>Wrong usage:
+</code></pre>
+<p>int<br>
+func (char *user)<br>
+{<br>
+printf (user);<br>
+}</p>
+<pre><code>Ok:
+</code></pre>
+<p>int<br>
+func (char *user)<br>
+{<br>
+printf ("%s", user);<br>
+}</p>
+<h3 id="the-format-function-family">2.2 The format function family</h3>
+<p>A number of format functions are defined in the ANSI C definition. There<br>
+are some basic format string functions on which more complex functions<br>
+are based on, some of which are not part of the standard but are widely<br>
+available.<br>
+Real family members:</p>
+<ul>
+<li>fprintf— prints to aFILEstream</li>
+<li>printf— prints to the ‘stdout’ stream</li>
+<li>sprintf— prints into a string</li>
+<li>snprintf— prints into a string with length checking</li>
+<li>vfprintf— print to aFILEstream from ava_argstructure</li>
+<li>vprintf— prints to ‘stdout’ from ava_argstructure</li>
+<li>vsprintf— prints to a string from ava_argstructure</li>
+<li>vsnprintf— prints to a string with length checking from ava_arg<br>
+structure</li>
+</ul>
+<pre><code>Relatives:
+</code></pre>
+<ul>
+<li>setproctitle— setargv[]</li>
+<li>syslog— output to the syslog facility</li>
+<li>others like err*, verr*, warn*, vwarn*</li>
+</ul>
+<h5 id="the-format-functions-2">6 2 THE FORMAT FUNCTIONS</h5>
+<h3 id="use-of-format-functions">2.3 Use of format functions</h3>
+<p>To understand where this vulnerability is common in C code, we have to<br>
+examine the purpose of format functions.<br>
+Functionality</p>
+<ul>
+<li>used to convert simple C datatypes to a string representation</li>
+<li>allow to specify the format of the representation</li>
+<li>process the resulting string (output to stderr, stdout, syslog, …)</li>
+</ul>
+<pre><code>How the format function works
+</code></pre>
+<ul>
+<li>the format string controls the behaviour of the function</li>
+<li>it specifies the type of parameters that should be printed</li>
+<li>parameters are saved on the stack (pushed)</li>
+<li>saved either directly (by value), or indirectly (by reference)</li>
+</ul>
+<pre><code>The calling function
+</code></pre>
+<ul>
+<li>has to know how many parameters it pushes to the stack, since it has<br>
+to do the stack correction, when the format function returns</li>
+</ul>
+<h3 id="what-exactly-is-a-format-string-.">2.4 What exactly is a format string ?.</h3>
+<p>A format string is an ASCIIZ string that contains text and format parame-<br>
+ters.<br>
+Example:</p>
+<pre><code>printf ("The magic number is: %d\n", 1911);
+</code></pre>
+<p>The text to be printed is “The magic number is:”, followed by a format<br>
+parameter ‘%d’, that is replaced with the parameter ( 1911 ) in the output.<br>
+Therefore the output looks like:The magic number is: 1911.<br>
+Some format parameters:</p>
+<pre><code>parameter output passed as
+%d decimal (int) value
+%u unsigned decimal (unsigned int) value
+%x hexadecimal (unsigned int) value
+%s string ((const) (unsigned) char *) reference
+%n number of bytes written so far, (* int) reference
+</code></pre>
+<p>The ‘\’ character is used to escape special characters. It is replaced<br>
+by the C compiler at compile-time, replacing the escape sequence by the</p>
+<p>2.5 The stack and its role at format strings 7</p>
+<p>appropiate character in the binary. The format functions do not recognize<br>
+those special sequences. In fact, they do not have anything to do with the<br>
+format functions at all, but are sometimes mixed up, as if they are evaluated<br>
+by them.<br>
+Example:</p>
+<pre><code>printf ("The magic number is: \x25d\n", 23);
+</code></pre>
+<p>The code above works, because ‘\x25’ is replaced at compile time with<br>
+‘%’, since 0x25 (37) is the ASCII value for the percent character.</p>
+<h3 id="the-stack-and-its-role-at-format-strings">2.5 The stack and its role at format strings</h3>
+<p>The behaviour of the format function is controlled by the format string. The<br>
+function retrieves the parameters requested by the format string from the<br>
+stack.</p>
+<p>printf (“Number %d has no address, number %d has: %08x\n”, i, a, &amp;a);</p>
+<pre><code>From within theprintffunction the stack looks like:
+</code></pre>
+<pre><code>stack top
+</code></pre>
+<p>…<br>
+&lt;&amp;a&gt;<br>
+<a><br>
+<i><br>
+A<br>
+…<br>
+stack bottom<br>
+where:<br>
+A address of the format string<br>
+i value of the variable i<br>
+a value of the variable a<br>
+&amp;a address of the variable i</i></a></p>
+<p>The format function now parses the format string ‘A’, by reading a<br>
+character a time. If it is not ‘%’, the character is copied to the output. In<br>
+case it is, the character behind the ‘%’ specifies the type of parameter that<br>
+should be evaluated. The string “%%” has a special meaning, it is used to<br>
+print the escape character ‘%’ itself. Every other parameter relates to data,<br>
+which is located on the stack.</p>
+<h5 id="format-string-vulnerabilities">8 3 FORMAT STRING VULNERABILITIES</h5>
+<h2 id="format-string-vulnerabilities-1">3 Format string vulnerabilities</h2>
+<p>The generic class of a format string vulnerability is a ‘channeling problem’.<br>
+This type of vulnerability can appear if two different types of information<br>
+channels are merged into one, and special escape characters or sequences<br>
+are used to distinguish which channel is currently active. Most of the times<br>
+one channel is a data channel, which is not parsed actively but just copied,<br>
+while the other channel is a controlling channel.<br>
+While this is not a bad thing in itself, it can quickly become a horrible<br>
+security problem if the attacker is able to supply input that is used in one<br>
+channel. Often there are faulty escape or de-escape routines, or they oversee<br>
+a level, such as in format string vulnerabilities. So to put it short: Channel-<br>
+ing problems are no security holes itself, but they make bugs exploitable.<br>
+To illustrate the general problem behind this, here is a table of common<br>
+channeling problems:</p>
+<pre><code>Situation Data channel Controlling channel Security problem
+Phone systems Voice or data Control tones seize line control
+PPP Protocol Transfer data PPP commands traffic amplification
+Stack Stack data Return addresses control of retaddr
+Malloc Buffers Malloc data Management info write to memory
+Format strings Output string Format parameters format function control
+</code></pre>
+<p>Back to the specific format string vulnerabilities, there are two typical<br>
+situations, where format string vulnerabilities can arise:<br>
+Type 1 (as in Linux rpc.statd, IRIX telnetd). Here the vulnerability lies<br>
+in the second parameter to the syslog function. The format string is partly<br>
+usersupplied.</p>
+<pre><code>char tmpbuf[512];
+</code></pre>
+<pre><code>snprintf (tmpbuf, sizeof (tmpbuf), "foo: %s", user);
+tmpbuf[sizeof (tmpbuf) - 1] = ’\0’;
+syslog (LOG_NOTICE, tmpbuf);
+</code></pre>
+<p>Type 2 (as in wu-ftpd, Qualcomm Popper QPOP 2.53). Here a partly<br>
+or completely usersupplied string is passed indirectly to a format function.</p>
+<p>int Error (char *fmt, …);</p>
+<p>…<br>
+int someotherfunc (char *user)<br>
+{<br>
+…</p>
+<p>3.1 What do we control now? 9</p>
+<pre><code>Error (user);
+</code></pre>
+<p>}</p>
+<p>While vulnerabilities of the first type are safely detected by automated<br>
+tools (for examplepscanorTESOgcc), vulnerabilities of the second type<br>
+can only be found if the tool is told that the function ‘Error’ is used like a<br>
+format function.^1</p>
+<h3 id="what-do-we-control-now-.">3.1 What do we control now ?.</h3>
+<p>Through supplying the format string we are able to control the behaviour<br>
+of the format function. We now have to examine what exactly we are able<br>
+to control, and how to use this control to extend this partial control over<br>
+the process to full control of the execution flow.</p>
+<h3 id="crash-of-the-program">3.2 Crash of the program</h3>
+<p>A simple attack using format string vulnerabilities is to make the process<br>
+crash. This can be useful for some things, for example to crash a daemon<br>
+that dumps core and there may be some useful data within the coredump.<br>
+Or in some network attacks it is useful to have a service not responding, for<br>
+example when DNS spoofing.<br>
+However, there may be some interest in crashing the process. At nearly<br>
+allUNIXsystems illegal pointer accesses are caught by the kernel and the<br>
+process will be send aSIGSEGVsignal. Normally the program is terminated<br>
+and dumps core.<br>
+By utilizing format strings we can easily trigger some invalid pointer<br>
+access by just supplying a format string like:</p>
+<pre><code>printf ("%s%s%s%s%s%s%s%s%s%s%s%s");
+</code></pre>
+<p>Because ‘%s’ displays memory from an address that is supplied on the<br>
+stack, where a lot of other data is stored, too, our chances are high to read<br>
+from anillegal address, which is not mapped. Also most format function<br>
+implementations offer the ‘%n’ parameter, which can be used to write to the<br>
+addresses on the stack. If that is done a few times, it should reliably produce<br>
+a crash, too.</p>
+<p>(^1) However, you can automate the process of identifying the extra format functions and<br>
+their parameters within the sourcecode, so all in all the process of finding format string<br>
+vulnerabilities can work completely automatically. You can even generalize, that if there<br>
+is such tool that does this and it does not find a format string vulnerability in your source<br>
+code, then your source code is free from having any of such vulnerabilities. This is not<br>
+the case with buffer overflows, where even manual auditing by experienced auditors can<br>
+miss vulnerabilities and there are no reliable ways to automatically check for them.</p>
+<h5 id="format-string-vulnerabilities-2">10 3 FORMAT STRING VULNERABILITIES</h5>
+<h3 id="viewing-the-process-memory">3.3 Viewing the process memory</h3>
+<p>If we can see the reply of the format function — the output string —, we can<br>
+gather useful information from it, since it is the output of the behaviour we<br>
+control, and we can use this results to gain an overview of what our format<br>
+string does and how the process layout looks like. This can be useful for<br>
+various things, such as finding the correct offsets for the real exploitation or<br>
+just reconstructing the stack frames of the target process.</p>
+<h4 id="viewing-the-stack">3.3.1 Viewing the stack</h4>
+<p>We can show some parts of the stack memory by using a format string like<br>
+this:</p>
+<pre><code>printf ("%08x.%08x.%08x.%08x.%08x\n");
+</code></pre>
+<p>This works, because we instruct theprintf-function to retrieve five pa-<br>
+rameters from the stack and display them as 8-digit padded hexadecimal<br>
+numbers. So a possible output may look like:</p>
+<pre><code>40012980.080628c4.bffff7a4.00000005.08059c
+</code></pre>
+<p>This is a partial dump of the stack memory, starting from the current<br>
+bottom upward to the top of the stack — assuming the stack grows towards<br>
+the low addresses. Depending on the size of the format string buffer and the<br>
+size of the output buffer, you can reconstruct more or less large parts of the<br>
+stack memory by using this technique. In some cases you can even retrieve<br>
+the entire stack memory.<br>
+A stack dump gives important information about the program flow and<br>
+local function variables and may be very helpful for finding the correct offsets<br>
+for a successful exploitation.</p>
+<h4 id="viewing-memory-at-any-location">3.3.2 Viewing memory at any location</h4>
+<p>It is also possible to peek at memory locations different from the stack<br>
+memory. To do this we have to get the format function to display memory<br>
+from an address we can supply. This poses two problems to us: First, we<br>
+have to find a format parameter which uses an address (by reference) as<br>
+stack parameter and displays memory from there, and we have to supply<br>
+that address. We are lucky in the first case, since the ‘%s’ parameter just<br>
+does that, it displays memory — usually an ASCIIZ string — from a stack-<br>
+supplied address. So the remaining problem is, how to get that address on<br>
+the stack, into the right place.</p>
+<p>3.4 Overwriting of arbitrary memory 11</p>
+<p>Our format string is usually located on the stack itself, so we already<br>
+have near to full control over the space, where the format string lies.^2<br>
+The format function internally maintains a pointer to the stack location<br>
+of the current format parameter. If we would be able to get this pointer<br>
+pointing into a memory space we can control, we can supply an address to<br>
+the ‘%s’ parameter. To modify the stack pointer we can simply use dummy<br>
+parameters that will ‘dig’ up the stack by printing junk:</p>
+<pre><code>printf ("AAA0AAA1_%08x.%08x.%08x.%08x.%08x");
+</code></pre>
+<p>The ‘%08x’ parameters increase the internal stack pointer of the format<br>
+function towards the top of the stack. After more or less of this increasing<br>
+parameters the stack pointer points into our memory: the format string<br>
+itself. The format function always maintains the lowest stack frame, so if<br>
+our buffer lies on the stack at all, it lies above the current stack pointer for<br>
+sure. If we choose the number of ‘%08x’ parameters correctly, we could just<br>
+display memory from an arbitrary address, by appending ‘%s’ to our string.<br>
+In our case the address is illegal and would be ‘AAA0’. Lets replace it with<br>
+a real one.<br>
+Example:</p>
+<p>address = 0x<br>
+address (encoded as 32 bit le string): “\x10\x01\x48\x08”</p>
+<pre><code>printf ("\x10\x01\x48\x08_%08x.%08x.%08x.%08x.%08x|%s|");
+</code></pre>
+<p>Will dump memory from0x08480110until aNULbyte is reached. By<br>
+increasing the memory address dynamically we can map out the entire pro-<br>
+cess space. It is even possible to create a coredump like image of the remote<br>
+process and to reconstruct a binary from it [ 13 ]. It is also helpful to find the<br>
+cause of unsuccessful exploitation attempts.<br>
+If we cannot reach the exact format string boundary by using 4-Byte<br>
+pops (‘%08x’), we have to pad the format string, by prepending one, two or<br>
+three junk characters.^3 This is analog to the alignment in buffer overflow<br>
+exploits.</p>
+<h3 id="overwriting-of-arbitrary-memory">3.4 Overwriting of arbitrary memory</h3>
+<p>The holy grail of exploitation is to take control of the instruction pointer<br>
+of a process. In most cases the instruction pointer (often namedIP or</p>
+<p>(^2) In this case we will assume that we have full control over the whole string. We will<br>
+later see, that also partial control, filtered characters, NUL-byte containing addresses and<br>
+similar problems are no matter when exploiting format string vulnerabilities<br>
+(^3) We can not move the stack pointer byte-wise, instead we move the format string itself,<br>
+so that it lies on a four-byte boundary to the stack pointer and we can reach it with a<br>
+multiple of four-byte pops</p>
+<h5 id="format-string-vulnerabilities-3">12 3 FORMAT STRING VULNERABILITIES</h5>
+<p>PC) is a register in the CPU and cannot be modified directly, since only<br>
+machine instructions can change it. But if we are able to issue those machine<br>
+instructions we already need to have control. So we cannot directly take<br>
+control over the process. Normally, the process has more priveledges than<br>
+the ones the attacker currently has.<br>
+Instead we have to find instructions that modify the instruction pointer<br>
+and take influence on how these instructions modify it. This sounds com-<br>
+plicated, but in most cases it is pretty easy, since there are instructions that<br>
+take a instruction pointer from the memory and jump to it. So in most<br>
+cases control over this part of the memory, where an instruction pointer is<br>
+stored, is the precessor to control over the instruction pointer itself. This is<br>
+how most buffer overflows work:<br>
+In a two-stage process, first a saved instruction pointer is overwritten and<br>
+then the program executes a legitimate instruction that transfers control to<br>
+the attacker-supplied address.<br>
+We will examine different ways to accomplish this using format string<br>
+vulnerabilities.</p>
+<h4 id="exploitation---similar-to-common-buffer-overflows.">3.4.1 Exploitation - similar to common buffer overflows.</h4>
+<p>Format string vulnerabilities sometimes offer a way around buffer length<br>
+limitations and allow exploitation that is similar to common buffer overflows.<br>
+Code like the one below appears in QPOP 2.53 and bftpd:</p>
+<p>{<br>
+char outbuf[512];<br>
+char buffer[512];</p>
+<p>sprintf (buffer, “ERR Wrong command: %400s”, user);<br>
+sprintf (outbuf, buffer);<br>
+}</p>
+<p>Such cases are often hidden deep inside reallife code and are not that<br>
+obvious as shown in the example above. By supplying a special format<br>
+string, we are able to circumvent the ‘%400s’ limitation:</p>
+<pre><code>"%497d\x3c\xd3\xff\xbf&lt;nops&gt;&lt;shellcode&gt;"
+</code></pre>
+<p>Everything is similar to a normal buffer overflow exploit string, just<br>
+the beginning — the “%497d” — is different. In normal buffer overflows<br>
+we overwrite the return address of a function frame on the stack. As the<br>
+function that owns this frame returns, it returns to our supplied address.<br>
+The address points to somewhere within the “” space. There are good<br>
+articles describing this method of exploitation and if this example is not fully</p>
+<p>3.4 Overwriting of arbitrary memory 13</p>
+<p>clear to you yet, you should consider reading an introductionary article, such<br>
+as [ 5 ], first.<br>
+It creates a string that is 497 characters long. Together with the error<br>
+string (“ERR Wrong command: ”) this exceeds theoutbuf buffer by four<br>
+bytes. Although the ‘user’ string is only allowed to be as long as 400 bytes,<br>
+we can extend its length by abusing format string parameters. Since the<br>
+secondsprintfis not checking the length, this can be used to break out<br>
+of the boundaries ofoutbuf. Now we write a return address (0xbfffd33c)<br>
+and exploit it just the old known way, as we would do it with any buffer<br>
+overflow. While any format parameter that allows ‘stretching’ the original<br>
+format string, such as “%50d”, “%50f” or “%50s” will do, it is desireable<br>
+to choose a parameter that does not dereference a pointer or may cause a<br>
+division by zero. This rules out “%f” and “%s”. We are left with the integer<br>
+output parameters: “%d”, “%u” and “%x”.<br>
+The GNU C library contains a bug, that results in a crash if you use<br>
+parameters like ‘%nd’ withngreater than 1000. This is one way to determine<br>
+the existance of the GNU C library remotely. If you use ‘%.nd’ it works<br>
+properly, except if very high values are used. For an in-depth discussion<br>
+about the length you can use in ‘%nd’ and ‘%.nd’ see portals article [ 3 ].</p>
+<h4 id="exploitation---through-pure-format-strings.">3.4.2 Exploitation - through pure format strings.</h4>
+<p>If we have no possible way to apply the simple exploitation method just<br>
+mentioned, we can still exploit the process. By doing so we extend our very<br>
+limited control — the ability to control the behaviour of the format function<br>
+— to real execution control, that is executing our raw machine code. Look<br>
+at code like it is found in wu-ftpd 2.6.0 and below:</p>
+<p>{<br>
+char buffer[512];</p>
+<p>snprintf (buffer, sizeof (buffer), user);<br>
+buffer[sizeof (buffer) - 1] = ’\0’;<br>
+}</p>
+<p>In the code above it is not possible to enlarge our buffer by inserting<br>
+some kind of ‘stretching’ format parameter, because the program uses the<br>
+securesnprintffunction to assure we will not be able to exceed thebuffer.<br>
+At first it may look as if we cannot do much useful things, except crashing<br>
+the program and inspecting some memory.<br>
+Lets remember the format parameters mentioned. There is the ‘%n’<br>
+parameter, which writes the number of bytes already printed, into a variable<br>
+of our choice. The address of the variable is given to the format function by<br>
+placing an integer pointer as parameter onto the stack.</p>
+<h5 id="format-string-vulnerabilities-4">14 3 FORMAT STRING VULNERABILITIES</h5>
+<pre><code>int i;
+</code></pre>
+<pre><code>printf ("foobar%n\n", (int *) &amp;i);
+printf ("i = %d\n", i);
+</code></pre>
+<p>Would print “i = 6”. With the same method we used above to print<br>
+memory from arbitrary addresses, we can write to arbitrary locations:</p>
+<pre><code>"AAA0_%08x.%08x.%08x.%08x.%08x.%n"
+</code></pre>
+<p>With the ‘%08x’ parameter we increase the internal stack pointer of the<br>
+format function by four bytes. We do this until this pointer points to the<br>
+beginning of our format string (to ‘AAA0’). This works, because usually<br>
+our format string is located on the stack, on top of our normal format<br>
+function stack frame. The ‘%n’ writes to the address0x30414141, that is<br>
+represented by the string “AAA0”. Normally this would crash the program,<br>
+since this address is not mapped. But if we supply a correct mapped and<br>
+writeable address this works and we overwrite four bytes (sizeof (int))<br>
+at the address:</p>
+<p>“\xc0\xc8\xff\xbf_%08x.%08x.%08x.%08x.%08x.%n”</p>
+<p>The format string above will overwrite four bytes at0xbfffc8c0with a<br>
+small integer number. We have reached one of our goals: we can write to<br>
+arbitrary addresses. But we cannot control the number we are writing yet<br>
+— but this will change.<br>
+The number we are writing — the count of characters written by the<br>
+format function — is dependant on the format string. Since we control the<br>
+format string, we can at least take influence on this counter, by writing more<br>
+or less bytes:</p>
+<pre><code>int a;
+printf ("%10u%n", 7350, &amp;a);
+/* a == 10 */
+</code></pre>
+<pre><code>int a;
+printf ("%150u%n", 7350, &amp;a);
+/* a == 150 */
+</code></pre>
+<p>By using a dummy parameter ‘%nu’ we are able to control the counter<br>
+written by ‘%n’, at least a bit. But for writing large numbers — such as<br>
+addresses — this is not sufficient, so we have to find a way to write arbitrary<br>
+data.<br>
+An integer number on the x86 architecture is stored in four bytes, which<br>
+are little-endian ordered, the least significant byte being the first in memory.</p>
+<p>3.4 Overwriting of arbitrary memory 15</p>
+<p>So a number like0x0000014cis stored in memory as: “\x4c\x01\x00\x00”.<br>
+For the counter in the format function we can control the least significant<br>
+byte, the first byte stored in memory by using dummy ‘%nu’ parameters to<br>
+modify it.<br>
+Example:</p>
+<pre><code>unsigned char foo[4];
+</code></pre>
+<pre><code>printf ("%64u%n", 7350, (int *) foo);
+</code></pre>
+<p>When the printf function returns,foo[0]contains ‘\x40’, which is equal<br>
+to 64, the number we used to increase the counter.<br>
+But for an address, there are four bytes that we have to control com-<br>
+pletely. If we are unable to write four bytes at once, we can try to write a<br>
+byte a time for four times in a row. On most CISC architectures it is possi-<br>
+ble to write to unaligned arbitrary addresses. This can be used to write to<br>
+the second least significant byte of the memory, where the address is stored.<br>
+This looks like:</p>
+<pre><code>unsigned char canary[5];
+unsigned char foo[4];
+</code></pre>
+<pre><code>memset (foo, ’\x00’, sizeof (foo));
+/* 0 * before */ strcpy (canary, "AAAA");
+</code></pre>
+<pre><code>/* 1 */ printf ("%16u%n", 7350, (int *) &amp;foo[0]);
+/* 2 */ printf ("%32u%n", 7350, (int *) &amp;foo[1]);
+/* 3 */ printf ("%64u%n", 7350, (int *) &amp;foo[2]);
+/* 4 */ printf ("%128u%n", 7350, (int *) &amp;foo[3]);
+</code></pre>
+<pre><code>/* 5 * after */ printf ("%02x%02x%02x%02x\n", foo[0], foo[1],
+foo[2], foo[3]);
+printf ("canary: %02x%02x%02x%02x\n", canary[0],
+canary[1], canary[2], canary[3]);
+</code></pre>
+<p>Returns the output “ 10204080 ” and “canary: 00000041”. We over-<br>
+write four times the least significant byte of an integer we point to. By<br>
+increasing the pointer each time, the least significant byte moves through<br>
+the memory we want to write to, and allows us to store completely arbitrary<br>
+data.<br>
+As you can see in the first row of the figure 1 , all eight bytes are not<br>
+touched yet by our overwrite code. From the second row on we trigger<br>
+four overwrites, shifted by one byte to the right for every step. The last<br>
+row shows the final desired state: we overwrote all four bytes of ourfoo</p>
+<h5 id="format-string-vulnerabilities-5">16 3 FORMAT STRING VULNERABILITIES</h5>
+<pre><code>Figure 1: Four stage overwrite of an address
+</code></pre>
+<pre><code>00 00 00 00
+</code></pre>
+<pre><code>10 00 00 00
+</code></pre>
+<pre><code>10 20 00 00
+</code></pre>
+<pre><code>10 20 40 00
+</code></pre>
+<pre><code>10 20 40 80
+</code></pre>
+<pre><code>41 41 41 41 00
+</code></pre>
+<pre><code>41 41 41 41 00
+</code></pre>
+<pre><code>00 41 41 41 00
+</code></pre>
+<pre><code>00 00 41 41 00
+</code></pre>
+<pre><code>00 00 00 41 00
+</code></pre>
+<pre><code>10 20 40 80 00 00 00 41 00
+</code></pre>
+<h3 id="section">0 1 2 3 4 5</h3>
+<pre><code>before
+</code></pre>
+<pre><code>after
+</code></pre>
+<p>array, but while doing so, we destroyed three bytes of thecanaryarray. We<br>
+included thecanaryarray just to see that we are overwriting memory we<br>
+do not want to.<br>
+Although this method looks complex, it can be used to overwrite arbi-<br>
+trary data at arbitrary addresses. For explanation we have only used one<br>
+write per format string until now, but it is also possible to write multiple<br>
+times within one format string:</p>
+<pre><code>strcpy (canary, "AAAA");
+printf ("%16u%n%16u%n%32u%n%64u%n",
+1, (int *) &amp;foo[0], 1, (int *) &amp;foo[1],
+1, (int *) &amp;foo[2], 1, (int *) &amp;foo[3]);
+</code></pre>
+<pre><code>printf ("%02x%02x%02x%02x\n", foo[0], foo[1],
+foo[2], foo[3]);
+printf ("canary: %02x%02x%02x%02x\n", canary[0],
+canary[1], canary[2], canary[3]);
+</code></pre>
+<p>We use the ‘ 1 ’ parameters as dummy arguments to our ‘%u’ paddings.<br>
+Also, the padding has changed, since the counter of the characters is already<br>
+at 16 when we want to write 32. So we only have to add 16 characters instead<br>
+of 32 to it, to get the results we desire.<br>
+This was a special case, in which all the bytes increased throughout the<br>
+writes. But we could also write80 40 20 10with only a minor modifica-<br>
+tion. Since we write integer numbers and the order is little endian, only the<br>
+least significant byte is important in the writes. By using counters of 0x80,<br>
+0x140, 0x220 and 0x310 characters respectivly when “%n” is triggered, we</p>
+<p>3.4 Overwriting of arbitrary memory 17</p>
+<p>can construct the desired string. The code to calculate the desired number-<br>
+of-written-chars counter is this:</p>
+<pre><code>write_byte += 0x100;
+already_written %= 0x100;
+padding = (write_byte - already_written) % 0x100;
+if (padding &lt; 10)
+padding += 0x100;
+</code></pre>
+<p>Where ‘write_byte’ is the byte we want to create, ‘already_written’<br>
+is the current counter of written bytes the format function maintains and<br>
+‘padding’ is the number of bytes we have to increase the counter with.<br>
+Example:</p>
+<pre><code>write_byte = 0x7f;
+already_written = 30;
+</code></pre>
+<pre><code>write_byte += 0x100; /* write_byte is 0x17f now */
+already_written %= 0x100; /* already_written is 30 */
+</code></pre>
+<pre><code>/* afterwards padding is 97 (= 0x61) */
+padding = (write_byte - already_written) % 0x100;
+if (padding &lt; 10)
+padding += 0x100;
+</code></pre>
+<p>Now a format string of “%97u” would increase the ‘%n’-counter, so that<br>
+the least significant byte equals ‘write_byte’. The final check if the padding<br>
+is below ten deserves some attention. A simple integer output, such as “%u”<br>
+can generate a string of a length up to ten characters, depending on the<br>
+integer number it outputs.^4 If the required length is larger than the padding<br>
+we specify, say we want to output ‘ 1000 ’ with a “%2u”, our value will be<br>
+dropped in favor to not losing any meaningful output. By ensuring our<br>
+padding is always larger than 10, we can keep an always accurate number<br>
+of ‘already_written’, the counter the format function maintains, since we<br>
+always write exactly as much output bytes as specified with the length option<br>
+in the format parameter.<br>
+The only remaining thing to exploit such vulnerabilities in a hands-on<br>
+practical way is to put the arguments into the right order on the stack and<br>
+use astackpop sequenceto increase the stack pointer. It should look like:</p>
+<pre><code>A
+&lt;stackpop&gt;&lt;dummy-addr-pair * 4&gt;&lt;write-code&gt;
+</code></pre>
+<p>(^4) This depends on the default wordsize of the system the format function runs on. We<br>
+assume an ILP32 based architecture here.</p>
+<h5 id="variations-of-exploitation">18 4 VARIATIONS OF EXPLOITATION</h5>
+<p>stackpop The sequence of stack popping parameters that increase the stack<br>
+pointer. Once the stackpop has been processed, the format function<br>
+internal stack pointer points to the beginning of thedummy-addr-pair<br>
+strings.</p>
+<p>dummy-addr-pair Four pairs of dummy integer values and addresses to<br>
+write to. The addresses are increasing by one with each pair, the<br>
+dummy integer value can be anything that does not containNULbytes.</p>
+<p>write-code The part of the format string that actually does the writing<br>
+to the memory, by using ‘%nu%n’ pairs, wherenis greater than 10.<br>
+The first part is used to increase or overflow the least significant byte<br>
+of the format function internal bytes-written counter, and the ‘%n’<br>
+is used to write this counter to the addresses that are within the<br>
+dummy-addr-pairpart of the string.</p>
+<p>The write code has to be modified to match the number of bytes written<br>
+by thestackpop, since thestackpopwrote already characters to the output<br>
+when the format function parses thewrite-code— the format function<br>
+counter does not start at zero, and this has to be considered.<br>
+The address we are writing to is calledReturn Address Location, short<br>
+retloc, the address we create with our format string at this place is called<br>
+theReturn Address, shortretaddr.</p>
+<h2 id="variations-of-exploitation-1">4 Variations of Exploitation</h2>
+<p>Exploitation is an art. Like in any art there is more then one way to accom-<br>
+plish things. Often you do not want to go the well trodden way of exploiting<br>
+things, but take advantage of your target environment, experimenting, dis-<br>
+covering and using existing behaviours in the program. This extra effort<br>
+can repay in a lot of things, the first being the reliability and robustness of<br>
+your exploit. Or if only one platform or system is affected by a vulnerability<br>
+you can take advantage of the special system features to find a shortcut<br>
+to exploit. There are a lot of things that can be used, this is just a basic<br>
+overview of common techniques.</p>
+<h3 id="short-write">4.1 Short Write</h3>
+<p>Instead of writing four times it is also possible to overwrite an address with<br>
+just two write operations. This is possible through the normal ‘%n’ operation<br>
+and ‘%nu’-strings with large ‘n’ values. But for this special case we can take<br>
+advantage of a special write operation, which writes short int types: the ‘%hn’<br>
+parameter. The ‘h’ can be used in other format parameters too, to cast the<br>
+value supplied on the stack to a short type. The short write technique has<br>
+one advantage over the first technique: It does not destroy data beside the</p>
+<p>4.2 Stack Popping 19</p>
+<p>address, so if there is valueable data behind the address you are overwriting,<br>
+such as a function parameter, it is preserved.<br>
+But in general you should avoid it, although it is supported by most C<br>
+libraries: it is dependant on the behaviour of the format function, namely<br>
+if the internal counter of written chars can exceed the buffer boundary.<br>
+This does not work on old GNU C libraries (libc5). Also it consumes more<br>
+memory in the target process.</p>
+<pre><code>printf ("%.29010u%hn%.32010u%hn",
+1, (short int *) &amp;foo[0],
+1, (short int *) &amp;foo[2]);
+</code></pre>
+<p>This is especially useful for RISC based systems, which have alignment<br>
+restrictions for the ‘%n’ directive. By using the short qualifier the alignment<br>
+is emulated either in software or special machine instructions are used, and<br>
+you can usually write on every two byte boundary.<br>
+Beside that it works exactly like the four byte technique. Some people<br>
+even say it is possible to do the write in one shot, by using especially large<br>
+paddings, such as ‘%.3221219073u’. But practice has shown that it does not<br>
+work on most systems. A in-depth analysis of this theme was first shown in<br>
+portal’s article [ 3 ]. Some other nice notes can be found in an early released<br>
+HERT paper [ 4 ].</p>
+<h3 id="stack-popping">4.2 Stack Popping</h3>
+<p>A problem can arise if the format string is too short to supply a stack<br>
+popping sequence that will reach your own string. This is a race between<br>
+the real distance to your format string and the size of the format string, in<br>
+which you have to pop at least the real distance. So there is a demand for an<br>
+effective method to increase the stack pointer with as few bytes as possible.<br>
+Currently we have used only ‘%u’ sequences, to show the principle, but<br>
+there are more effective methods. A ‘%u’ sequence is two bytes long and<br>
+pops four bytes, which gives a 1:2 byte ratio (we invest 1 byte to get 2 bytes<br>
+ahead).<br>
+Through using the ‘%f’ parameter we even get 8 bytes ahead in the<br>
+stack, while only investing two bytes. But this has a huge drawback, since<br>
+if garbage from the stack is printed as floating point number, there may be<br>
+a division by zero, which will crash the process. To avoid this we can use<br>
+a special format qualifier, which will only print the integer part of the float<br>
+number: ‘%.f’ will walk the stack upwards by eight bytes, using only three<br>
+bytes in our buffer.<br>
+Under BSD derivates and IRIX, it is possible to abuse the ‘*’-qualifier<br>
+for our purposes. It is used to dynamically supply the length of the output a<br>
+format parameter will produce. While ‘%10d’ prints 10 characters, the ‘%*d’</p>
+<h5 id="variations-of-exploitation-2">20 4 VARIATIONS OF EXPLOITATION</h5>
+<p>retrieves the length of the output dynamically: the next format parameter on<br>
+the stack supplies it. Because the LibC’s mentioned above allow parameters<br>
+of the type ‘%******<em>d’, we can pull four bytes per ‘</em>’, which relates to a<br>
+four-by-one ratio. This creates another problem though: we cannot predict<br>
+the output length in most cases, since it is set dynamically from the stack<br>
+content.<br>
+But we can override the dynamic specification by issuing a hardcoded<br>
+value behind all starts: ‘%********10d’ will always print 10 bytes, no matter<br>
+what was peeked from the stack before. Those tricks were discovered by<br>
+lorian.</p>
+<h3 id="direct-parameter-access.">4.3 Direct Parameter Access.</h3>
+<p>Beside improving the stack popping methods, there is a huge simplification<br>
+which is known as ‘direct parameter access’, a way to directly address a<br>
+stack parameter from within the format string. Almost all currently in use<br>
+C libraries do support this features, but not all are useable to apply this<br>
+method to format string exploitation.<br>
+The direct parameter access is controlled by the ‘<span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">’</mi><mi>q</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>i</mi><mi>f</mi><mi>i</mi><mi>e</mi><mi>r</mi><mo>:</mo><mi>p</mi><mi>r</mi><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy="false">(</mo><mi mathvariant="normal">"</mi></mrow><annotation encoding="application/x-tex">’ qualifier:
+printf ("%6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.88888em; vertical-align: -0.19444em;"></span><span class="mord">’</span><span class="mord mathdefault" style="margin-right: 0.03588em;">q</span><span class="mord mathdefault">u</span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right: 0.01968em;">l</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right: 0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right: 0.02778em;">r</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault" style="margin-right: 0.02778em;">r</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">t</span><span class="mord mathdefault" style="margin-right: 0.10764em;">f</span><span class="mopen">(</span><span class="mord">"</span></span></span></span></span>d\n", 6, 5, 4, 3, 2, 1);<br>
+Prints ‘1’, because the ‘6$’ explicitly addresses the 6th parameter on the<br>
+stack. Using this method the whole stack pop sequence can be left out.</p>
+<pre><code>char foo[4];
+</code></pre>
+<pre><code>printf ("%1$16u%2$n"
+"%1$16u%3$n"
+"%1$32u%4$n"
+"%1$64u%5$n",
+1,
+(int *) &amp;foo[0], (int *) &amp;foo[1],
+(int *) &amp;foo[2], (int *) &amp;foo[3]);
+</code></pre>
+<p>Will create “\x10\x20\x40\x80” in foo. This direct access is limited to<br>
+only the first eight parameters on BSD derivates, except IRIX. The Solaris<br>
+C Library limits it to the first 30 parameters, as shown in portals paper [ 3 ].<br>
+If you choose negative or huge values intending to access stack parameters<br>
+below your current positions it will not produce the expected result but<br>
+crash.<br>
+Although it simplifies the exploitation a lot, you should use the stackpop<br>
+techniques whenever possible, since it makes your exploit more portable. If<br>
+the bug you want to exploit exists only on one platform which allows this<br>
+method, you can of course take advantage of it (for example the IRIX telnet<br>
+daemon exploit by LSD [ 21 ] does this).</p>
+<h5 id="section-1">21</h5>
+<h2 id="brute-forcing">5 Brute Forcing</h2>
+<p>When exploiting a vulnerability such as a buffer overflow or a format string<br>
+vulnerability it often fails because the last hurdle was not taken care of: to<br>
+get all offsets right. Basically finding the right offsets means ‘what to write<br>
+where’. For simple vulnerabilities you can reliably guess the correct offsets,<br>
+or just brute force it, by trying them one after another. But as soon as you<br>
+need multiple offsets this problem increases exponentially, it turns out to be<br>
+impossible to brute force.<br>
+With format strings this problem only appears if you are exploiting a<br>
+daemon or any program which will offer you only one try. As soon as you<br>
+have multiple tries or you can see the response of the format string it is<br>
+possible, although not trivial to find all the necessary offsets.<br>
+This is possible because we already have limited control over the target<br>
+process before we completely take it over: our format string already directs<br>
+the remote process what to do, enabling us to peek in the memory or test<br>
+certain behaviours.<br>
+Since the two methods explained here differ so much, they are explained<br>
+seperatly.</p>
+<h3 id="response-based-brute-force.">5.1 Response Based Brute Force.</h3>
+<p>Taking advantage of seeing the printed format reply was first observed in<br>
+the most popular format string exploit for wu-ftpd 2.6.0 by tf8. He used the<br>
+reply to determine the distance.<br>
+Smiler and myself developed this technique further to determine the two<br>
+other addresses, the return address ‘retaddr’ and the return address location<br>
+‘retloc’ and used it to build a completely offset independant wu-ftpd exploit<br>
+(7350wu [ 22 ]).<br>
+To brute the distance, you should use a format string like this:</p>
+<pre><code>"AAAABBBB|stackpop|%08x|"
+</code></pre>
+<p>The stackpop depends on the distance we want to guess. The distance<br>
+is increased for every try:</p>
+<pre><code>while (distance &gt; 0) {
+strcat (stackpop, "%u");
+distance -= 4;
+}
+</code></pre>
+<pre><code>If we probe a distance of 32, the format string would look like:
+</code></pre>
+<pre><code>"AAAABBBB|%u%u%u%u%u%u%u%u|%08x|"
+</code></pre>
+<h5 id="brute-forcing-1">22 5 BRUTE FORCING</h5>
+<p>We pop 32 bytes from the stack (8 * “%u”) and print the four bytes at the<br>
+32th byte from the stack hexadecimal. In the ideal case the output would<br>
+look like:</p>
+<p>AAAABBBB|983217938177639561760134608728913021|41414141|</p>
+<p>‘ 41414141 ’ is the hexadecimal representation of ‘AAAA’, we have hit the<br>
+exact distance of 32 bytes. If you cannot reach this pattern by increasing<br>
+the distance this can have two reasons: either the distance is too big to<br>
+be reached, for example if the format string is located on the heap, or the<br>
+alignment is not on a four byte boundary. In the latter case, we just have<br>
+to prepend the format string with one to three dummy bytes. Then we<br>
+can slide the string position, so that the pattern ‘ 42414141 ’ becomes to the<br>
+correct pattern ‘ 41414141 ’.<br>
+Once you have the alignment and the distance you can start brute forcing<br>
+the format string buffer address. Therefore you use a format string like this:</p>
+<pre><code>addr|stackpop|______________________________%%|%s|
+</code></pre>
+<p>The format string is processed from the left to the right, the ‘addr’ and<br>
+the ‘___’ sequence will not do anything harmful. The ‘stackpop’ moves the<br>
+stack pointer upward until it points to the ‘addr’ address. Finally, the ‘%s’<br>
+now prints the ASCIIZ string from ‘addr’.<br>
+In the ideal case ‘addr’ would point into the ‘___’ sequence of our format<br>
+string. In this case the output would look like:</p>
+<pre><code>garbage|___________________________%|______%%|%s||
+</code></pre>
+<p>Where ‘garbage’ consists out of the ‘addr’ and ‘stackpop’ output. Then<br>
+the processed ‘___%%’ string is converted to ‘___%’, as the ‘%%’ is converted to<br>
+‘%’ by the format processing. Then the string ‘______%%|%s|’ is inserted as<br>
+the ‘%s’ of our supplied format string is processed. Note that this is the only<br>
+thing that varies as we try different values for ‘addr’. In our ideal case we<br>
+used an ‘addr’ that points directly into our buffer. As you can see, through<br>
+looking at the ‘%%’ we can distinguish between addresses that point into our<br>
+format string (those have two ‘%’ characters) and addresses that accidently<br>
+point into the target buffer (which have only one ‘%’ character, since it was<br>
+converted by the format function).<br>
+If ‘addr’ hits into the target buffer, the output looks like:</p>
+<pre><code>garbage|___________________________%|______%||
+</code></pre>
+<p>As you can see, only one ‘%’ is visible. This allows us to exactly predict<br>
+the target buffer address, which can be useful for situations where the format<br>
+string buffer is in the heap itself.</p>
+<p>5.2 Blind Brute Forcing 23</p>
+<p>Because we know where our ‘%s’ was located relativly to our format string<br>
+start, and we have an address that points into our buffer, we can relocate the<br>
+address so that we exactly know at what address our format string starts.<br>
+Since you usually want to put your shellcode into the format string, too,<br>
+you can exactly calculate the retaddr relative to the format string address.</p>
+<h3 id="blind-brute-forcing">5.2 Blind Brute Forcing</h3>
+<p>Blind brute forcing is not as straight forward as response based brute forcing<br>
+is. The basic idea is that we can measure the time it takes for the remote<br>
+computer to process the format string. A string like “%.9999999u” takes<br>
+longer than a simple “%u”. Also, we can reliably produce segmentation faults<br>
+by using “%n” on an unmapped address.<br>
+The basic approach for this kind of brute forcing was invented by tf8,<br>
+later improved by myself to also brute force the buffer addresses.<br>
+Since this attack is relativly complex and only useful for special situa-<br>
+tions, I supplied a working example in theexample/directory. It is inter-<br>
+esting if you can trigger the vulnerability multiple times, but you do not see<br>
+the response of the format function, such as in a service that syslogs.<br>
+If you are interested in this technique, look at the sources, I ommited a<br>
+description here, sorry.</p>
+<h2 id="special-cases">6 Special Cases</h2>
+<p>There are certain situations where you can take advantage of the situation,<br>
+do not have to know all offsets or you can make the exploitation simpler,<br>
+more straight forward and most important: reliable. I have listed a few<br>
+common approaches to exploiting format string vulnerabilities here.</p>
+<h3 id="alternative-targets">6.1 Alternative targets</h3>
+<p>Influenced through the long history of stack based buffer overflows, a lot of<br>
+people think that overwriting the return address stored on the stack is the<br>
+only way to seize control over the process. But if we exploit a format string<br>
+vulnerability we do not exactly know where our buffer is and there are alter-<br>
+native things we can overwrite. Common stack based buffer overflows allow<br>
+only return address overwrites, because those are stored on the stack, too.<br>
+With format functions however, we can write anywhere into the memory,<br>
+allowing us to modify the entire writeable process space.<br>
+It is therefore interesting to examine other ways to seize partial or full<br>
+control over the exploited process. In certain situations this can result in<br>
+an easier way of exploitation or - as we will see - can be used to circumvent<br>
+certain protections.</p>
+<h5 id="special-cases-1">24 6 SPECIAL CASES</h5>
+<p>I will discuss the alternative address locations briefly here, giving refer-<br>
+ence to more in-depth articles.</p>
+<p>6.1.1 GOT overwrite</p>
+<p>The process space of any ELF binary [ 12 ] includes a special section, called<br>
+the ‘Global Offset Table’ (GOT). Every library function used by the program<br>
+has an entry there that contains an address where the real function is located.<br>
+This is done to allow easy relocation of libraries within the process memory<br>
+instead of using hardcoded addresses. Before the program has used the<br>
+function the first time the entry contains an address of the run-time-linker<br>
+(rtl). If the function is called by the program the control is passed to the rtl<br>
+and the functions real address is resolved and inserted into the GOT. Every<br>
+call to that function passes the control directly to it and the rtl is not called<br>
+anymore for this function. For a more complete overview about exploitation<br>
+through the GOT, refer to the excellent article of our Lam3rZ brothers [ 19 ].<br>
+By overwriting a GOT entry for a function the program will use after<br>
+the format string vulnerability has been exploited we can seize control and<br>
+can jump to any executeable address. This unfortunately means that any<br>
+stack based protections, which perform checks on the return address will<br>
+fail.<br>
+The big advantage we gain from overwriting a GOT entry is its indepen-<br>
+dance to environment variables (such as the stack) and dynamic memory<br>
+allocation (heap). The address of a GOT entry is only fixed per binary, so<br>
+if two systems have the same binary running, then the GOT entry is always<br>
+at the same address.<br>
+You can see where the GOT entry for a function is by running:</p>
+<pre><code>objdump --dynamic-reloc binary
+</code></pre>
+<p>The address of the real function (or the rtl linking function) is directly<br>
+at the printed address.<br>
+Another really important factor why to use GOT entries to seize control<br>
+instead of return addresses is code of the form (found in some ‘secure’ finger<br>
+daemon):</p>
+<pre><code>syslog (LOG_NOTICE, user);
+exit (EXIT_FAILURE);
+</code></pre>
+<p>You cannot seize control here by overwriting a return address reliable.<br>
+You can try to overwritesyslog’s own return address here, but a more<br>
+reliable way is to overwrite the GOT entry of the ‘exit’ function, which will<br>
+pass the execution to the address you specify as soon as ‘exit’ is called.<br>
+But the most useful advantage of the GOT technique is its ease of use,<br>
+you just run objdump and you have the address to overwrite (retloc). Hack-<br>
+ers are lazy at typing (except sloppy ;-).</p>
+<p>6.1 Alternative targets 25</p>
+<h5 id="dtors">6.1.2 DTORS</h5>
+<p>Binaries compiled with the GNU C Compiler include a special destructor<br>
+table section, called ‘DTORS’. The destructors listed here are called just before<br>
+the real ‘exit’ system call is issued, after all the common cleanup operations<br>
+are done. TheDTORSsection is of the following format:</p>
+<p>DTORS: 0xffffffff 0x00000000 …</p>
+<p>Where the first entry is a counter which holds the number of function<br>
+pointers that follow or minus one (as it is the case here) if the list is empty.<br>
+On all implementations of the DTORS section this field is ignored. Then, at<br>
+relative offset +4 there are the addresses of the cleanup functions, terminated<br>
+by aNULLaddress. You can just overwrite thisNULLpointer with a pointer<br>
+to your shellcode and your code will be executed whenenver the program<br>
+exits. A more complete introduction to this technique can be found in [ 17 ].</p>
+<p>6.1.3 C library hooks</p>
+<p>A few month ago Solar Designer introduced a new technique to exploit heap<br>
+based overflows inmalloc-allocates memory. He suggested to overwrite<br>
+a hook that is present in the GNU C Library and some other propietary<br>
+libraries. Normally, this hook is used by memory debugging and profiling<br>
+tools, to get noticed whenever an application allocated or frees memory<br>
+using themallocinterface. There are a few hooks, but the most common<br>
+are__malloc_hook,__realloc_hookand__free_hook. Normally they are<br>
+set toNULL, but as soon as you overwrite them with a pointer to your code,<br>
+your code will be executed as eithermalloc,reallocandfreeis called.<br>
+Since the hooks are normally used as debug hooks they are called before the<br>
+real function is executed.<br>
+A discussion about the malloc-overwrite technique is given in Solar De-<br>
+signers advisory about the Netscape JPEG decoder vulnerability [ 15 ].</p>
+<p>6.1.4 atexit structures</p>
+<p>Also a few month ago, Kalou introduced a way to exploit statically linked<br>
+binaries under Linux, which take advantage of a generic handler called<br>
+‘__atexit’, which gets executed as soon as your program callsexit. This<br>
+allows a program to setup a number of handlers that will be called as it<br>
+exits, to release resources. A detailed discussion of attacks on the atexit<br>
+structure can be found in Pascal Bouchareines paper [ 16 ].</p>
+<p>6.1.5 function pointers</p>
+<p>If the victim application makes use of function pointers, chances are that<br>
+you can overwrite them. To make use of them, you have to overwrite it</p>
+<h5 id="special-cases-2">26 6 SPECIAL CASES</h5>
+<p>and afterwards trigger them. Some daemons use function pointer tables for<br>
+command processing, for example QPOP. Also function pointers are often<br>
+used to simulate atexit-like handlers, such as in SSHd.</p>
+<p>6.1.6 jmpbuf’s</p>
+<p>Firstjmpbufoverwrite techniques were used in exploitation of heap stored<br>
+buffers. With format stringsjmpbuf’s behave just like function pointers,<br>
+since we can write anywhere in the memory, not limited by the relative<br>
+position of thejmpbufto our buffer. An in-depth discussion can be found<br>
+in Shok’s paper about heap overflows [ 18 ].</p>
+<h3 id="return-into-libc">6.2 Return into LibC</h3>
+<p>You can use the common return-into-LibC technique, pioneered by - once<br>
+again - Solar Designer [ 14 ]. But sometimes there may be a shortcut, which<br>
+results in a easier exploitation:</p>
+<pre><code>FILE * f;
+char foobuf[512];
+</code></pre>
+<pre><code>snprintf (foobuf, sizeof (foobuf), user);
+foobuf[sizeof (foobuf) - 1] = ’\0’;
+f = fopen (foobuf, "r");
+</code></pre>
+<p>You can overwrite the GOT address of ‘fopen’ with the address of the<br>
+‘system’ function. Then use a format string such as:</p>
+<pre><code>"cd /tmp;cp /bin/sh .;chmod 4777 sh;exit;"
+"addresses|stackpop|write"
+</code></pre>
+<p>Where ‘addresses’, ‘stackpop’ and ‘write’ are the common format string<br>
+exploitation sequences. They are used to overwrite the GOT entry of ‘fopen’<br>
+with the address of ‘system’. As ‘fopen’ is called the string is passed to the<br>
+‘system’ function. Alternativly you can use the common old method, as<br>
+described below.</p>
+<h3 id="multiple-print">6.3 Multiple Print</h3>
+<p>If you can trigger the format string vulnerability multiple times within the<br>
+same process (such as in wu-ftpd), you can overwrite more then just the re-<br>
+turn address. For example you can store the entire shellcode on the heap to<br>
+circumvent any non-executeable-stack protection. Together with the other<br>
+techniques explained here you can circumvent the following protection facil-<br>
+ities (certainly not complete):</p>
+<p>6.4 Format string within the Heap 27</p>
+<ul>
+<li>StackGuard</li>
+<li>StackShield</li>
+<li>Openwall kernel patch (by Solar Designer)</li>
+<li>libsafe</li>
+</ul>
+<p>In the middle of October 2000 a group of people published a series of<br>
+Linux kernel patches known as PaX [ 11 ], that effectivly allow to implement<br>
+pages that are read- and writeable but not executeable. Since it is not<br>
+possible to do this nativly on the x86 CPU series, the patch uses some tricks,<br>
+discovered by the Plex CPU emulator project. On a system running this<br>
+patch it is virtually impossible to execute arbitrary shellcode you introduced<br>
+into the process. But most of the times there is already useful code within<br>
+the process space itself. We can execute this code to do things we would<br>
+normally do in our shellcode.<br>
+Using common Return-into-LibC techniques [ 14 ] you can circumvent this<br>
+protection. The simplest case is to return into thesystem()library function<br>
+using the format string as parameter.<br>
+By optimizing the strings a bit, you can reduce the mandatory offsets to<br>
+know to just one: the address of thesystem()function. To call a program<br>
+you can use this sequence at the end of your format string:</p>
+<p>“;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;id &gt; /tmp/owned;exit;”</p>
+<p>Any address that points into the ‘;’ characters and passed to thesystem()<br>
+function will execute the commands, since the ‘;’ characters act a ‘nop’ com-<br>
+mands to the shell.</p>
+<h3 id="format-string-within-the-heap">6.4 Format string within the Heap</h3>
+<p>Until now we have assumed that the format string always lies on the stack.<br>
+But however, there are cases, where it is stored on the heap. If there is<br>
+another buffer on the stack we can influence we can use that one to supply the<br>
+addresses to write to, but if there is no such buffer we have few alternatives<br>
+left.<br>
+If the target buffer lies on the stack, we can first print to it, and then<br>
+use the addresses from there, to write using the ‘%n’ parameters:</p>
+<p>void<br>
+func (char *user_at_heap)<br>
+{<br>
+char outbuf[512];</p>
+<pre><code>snprintf (outbut, sizeof (outbuf), user_at_heap);
+</code></pre>
+<h5 id="special-cases-3">28 6 SPECIAL CASES</h5>
+<pre><code>outbuf[sizeof (outbuf) - 1] = ’\0’;
+</code></pre>
+<p>return;<br>
+}</p>
+<p>Here we use a format string that contains the addresses we want to<br>
+write to, as usual. But whats special about it, is that we do not access those<br>
+addresses from the format string itself, but from the target buffer. To do<br>
+this we have to first store the addresses on the stack, by simply printing<br>
+them. Therefore the write sequence has to be behind the addresses within<br>
+the format string.<br>
+If both buffers do not lie within the stack, we have a problem:</p>
+<p>void<br>
+func (char *user_at_heap)<br>
+{<br>
+char * outbuf = calloc (1, 512);</p>
+<pre><code>snprintf (outbut, 512, user_at_heap);
+outbuf[511] = ’\0’;
+</code></pre>
+<p>return;<br>
+}</p>
+<p>Now it depends on whether we have some way of supplying data on<br>
+the stack. For example, some exploits for wu-ftpd used the password field<br>
+to store data in (shellcode, not addresses though - those exploits can not<br>
+exploit non-anonymous accounts).<br>
+Every vulnerability and exploit is different, and one should have invested<br>
+hours of studying the vulnerability before stating that it is not exploitable,<br>
+and even then there are cases you are wrong, as not only the history of<br>
+format string vulnerabilities have shown. (Hi OpenBSD team! :-).</p>
+<h3 id="special-considerations">6.5 Special considerations</h3>
+<p>Beside the exploitation itself there are some things to consider. If the shell-<br>
+code is contained within the format string it may not contain ‘\x25’ (%) or<br>
+NULbytes. But since no important opcode is in neither 0x25 or 0x00 you<br>
+will not run into problems when constructing shellcode. The same is true if<br>
+the addresses are stored on the format string, too. If an address you want<br>
+to write to contains aNUL-byte in the least significant byte, you can replace<br>
+it with a short-write on an odd address just below the address you want to<br>
+store the byte on. This is not possible on all architectures, though. Also,<br>
+you can use two seperate format strings. The first creates the address you</p>
+<h5 id="section-2">29</h5>
+<p>want to write to in the memory behind the whole string. The second uses<br>
+this address to write to it.<br>
+This may become complicated pretty soon, but allows reliable exploita-<br>
+tion and is sometimes worth the effort.</p>
+<h2 id="tools">7 Tools</h2>
+<p>Once the exploit is finished, or even within the exploit development it is<br>
+helpful to use tools to retrieve the necessary offsets. Some tools can also<br>
+help in identifying vulnerabilities such as format string vulnerabilities in<br>
+closed source software. I have listed four tools here, which were very helpful<br>
+for me, and may be for you, too.</p>
+<h3 id="ltrace-strace">7.1 ltrace, strace</h3>
+<p>ltrace [ 8 ] and strace [ 9 ] work in a similar way: they hook library and system<br>
+calls, logging their parameters and return values, as the program calls them.<br>
+This allows you to observe how the program interacts with the system,<br>
+considering the program itself as a black box.<br>
+All readymade format functions are library calls and their parameters,<br>
+most important their addresses can be observed using ltrace. This way you<br>
+can quickly determine the address of the format string in any process you<br>
+canptrace. The strace program is used to get the addresses of buffers where<br>
+data is read into, for example ifreadis called to read in data that is later<br>
+used as the format string.<br>
+To learn the usage of this two tools can repay in saving a lot of time,<br>
+which you would use in trying to attach GDB to an outdated program with<br>
+missing symbols and compiler optimizations, just to find two simple offsets.</p>
+<h3 id="gdb-objdump">7.2 GDB, objdump</h3>
+<p>GDB [ 7 ], the classic ‘GNU Debugger’ is a text based debugger, which is<br>
+suited for both source level and machine code debugging. Although it does<br>
+not look very comfortable, once you get used to it, it is a powerful interface<br>
+to the programs internals. It is handy for anything from debugging your<br>
+exploit to watching the process getting exploited.<br>
+Objdump, a program from the GNU binutils package [ 10 ], is suited to<br>
+retrieve any information for a binary executeable or object file, such as the<br>
+memory layout, the sections or a disassembly of the main function. We<br>
+mainly use it to retrieve the addresses of the GOT entries from the binary.<br>
+But it can serve you in a lot of different useful ways.</p>
+<h5 id="references">30 REFERENCES</h5>
+<h2 id="references-1">References</h2>
+<pre><code>[1]TESO Security Group,
+http://www.team-teso.net/
+</code></pre>
+<pre><code>[2]Chaos Computer Club: 17th Chaos Communication Congress,
+http://www.ccc.de/congress/
+</code></pre>
+<pre><code>[3]portal,
+“Format String Exploitation Demystified”, preliminary version 21,
+not yet published, http://www.security.is/
+</code></pre>
+<pre><code>[4]Pascal Bouchareine,
+“format string vulnerability”,
+http://www.hert.org/papers/format.html
+</code></pre>
+<pre><code>[5]Plasmoid / THC,
+Stack overflows,
+http://www.thehackerschoice.com/papers/OVERFLOW.TXT
+</code></pre>
+<pre><code>[6]Halvar Flake,
+“Auditing binaries for security vulnerabilities”,
+http://www.blackhat.com/presentations/bh-europe-
+00/HalvarFlake/HalvarFlake.ppt
+</code></pre>
+<pre><code>[7]GDB, The GNU Debugger,
+http://www.gnu.org/software/gdb/gdb.html
+</code></pre>
+<pre><code>[8]ltrace, no official maintainer,
+http://www.debian.org/Packages/stable/utils/ltrace.html
+</code></pre>
+<pre><code>[9]strace,
+http://www.wi.leidenuniv.nl/%7ewichert/strace/
+</code></pre>
+<p>[10]GNU binutils,<br>
+<a href="http://www.gnu.org/gnulist/production/binutils.html">http://www.gnu.org/gnulist/production/binutils.html</a></p>
+<p>[11]PaX group,<br>
+“Implementing non executeable rw pages on the x86”,<br>
+<a href="http://pageexec.virtualave.net/">http://pageexec.virtualave.net/</a></p>
+<p>[12]Tool Interface Standard,<br>
+Executeable and Linking Format Specifications v1.2,<br>
+<a href="http://segfault.net/%7escut/cpu/generic/TIS-ELFv1.2.pdf">http://segfault.net/%7escut/cpu/generic/TIS-ELFv1.2.pdf</a></p>
+<p>[13]Silvio,<br>
+“ELF executeable reconstruction from a core image”,<br>
+<a href="http://www.big.net.au/%7esilvio/core-reconstruction.txt">http://www.big.net.au/%7esilvio/core-reconstruction.txt</a></p>
+<h5 id="references-31">REFERENCES 31</h5>
+<p>[14]Solar Designer,<br>
+post to Bugtraq mailing list demonstrating return into libc,<br>
+Bugtraq Archives 1997 August 10</p>
+<p>[15]Solar Designer,<br>
+JPEG COM Marker Processing Vulnerability in Netscape Browsers,<br>
+advisory demonstrating malloc management information overwrite,<br>
+<a href="http://www.openwall.com/advisories/OW-002-netscape-jpeg.txt">http://www.openwall.com/advisories/OW-002-netscape-jpeg.txt</a></p>
+<p>[16]Pascal Bouchareine,<br>
+“__atexitin memory bugs: proof of concept”</p>
+<p>[17]Juan M. Bello Rivas,<br>
+“Overwriting the.dtorssection”</p>
+<p>[18]Matt Conover aka Shok,<br>
+“w00w00 on Heap Overflows”,<br>
+<a href="http://www.w00w00.org/files/articles/heaptut.txt">http://www.w00w00.org/files/articles/heaptut.txt</a></p>
+<p>[19]Bulba and Kil3r, Lam3rZ,<br>
+Bypassing StackGuard and StackShield,<br>
+Phrack issue 56, article #5, <a href="http://phrack.infonexus.com/">http://phrack.infonexus.com/</a></p>
+<p>[20]Kil3r, Lam3rZ,<br>
+33_su.c, exploit for su/msgfmt for Immunix Linux</p>
+<p>[21]LSD crew,<br>
+IRIX telnet daemon exploitirx_telnetd.cand explanations,<br>
+<a href="http://www.lsd-pl.net/,">http://www.lsd-pl.net/,</a><br>
+<a href="http://www.securityfocus.com/templates/archive.pike?list=1&amp;mid=75864">http://www.securityfocus.com/templates/archive.pike?list=1&amp;mid=75864</a></p>
+<p>[22]TESO wu-ftpd 2.6.0 exploit: 7350wu,<br>
+<a href="http://www.team-teso.net/releases.php">http://www.team-teso.net/releases.php</a></p>
+</div>
+</body>
+
+</html>
