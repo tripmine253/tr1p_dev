@@ -9,7 +9,6 @@ $softwareList = Get-AppxPackage | select Name
 # crap I didn't want
 $shitlist = "Microsoft.Windows.PeopleExperienceHost     
 Microsoft.Wallet                           
-Microsoft.Messaging                        
 Microsoft.ZuneMusic                        
 Microsoft.Advertising.Xaml                 
 Microsoft.MicrosoftSolitaireCollection     
@@ -17,15 +16,10 @@ Microsoft.StorePurchaseApp
 Microsoft.XboxSpeechToTextOverlay          
 Microsoft.BingWeather                      
 Microsoft.WindowsAlarms                    
-Microsoft.WindowsStore                     
 Microsoft.ZuneVideo                        
 microsoft.windowscommunicationsapps        
-Microsoft.Windows.Photos                   
 Microsoft.Getstarted                       
 Microsoft.WindowsMaps                      
-Microsoft.OneConnect                       
-Microsoft.People                           
-Microsoft.MicrosoftOfficeHub               
 828B5831.HiddenCityMysteryofShadows        
 A278AB0D.DragonManiaLegends                
 Nordcurrent.CookingFever                   

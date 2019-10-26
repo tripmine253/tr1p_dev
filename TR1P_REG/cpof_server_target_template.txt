@@ -1,0 +1,34 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\prefs\cpof\bc13\cpof\servers\databridge]
+"default"="1.2.3.4"
+"type"="ipaddress"
+"value"="10.9.8.7"
+"display"="/Data/Bridge"
+"description"="/I/P address of the /Data/Bridge server"
+"seq"="10"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\prefs\cpof\bc13\cpof\servers\monitor]
+"default"="127.0.0.1"
+"type"="ipaddress"
+"value"="1.2.3.4"
+"display"="/Remote /Admin"
+"description"="/I/P address of the /Remote /Admin server"
+"seq"="40"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\prefs\cpof\bc13\cpof\servers\repository]
+"default"="1.2.3.4"
+"type"="ipaddress"
+"value"="10.9.8.7"
+"display"="/Repository"
+"description"="/I/P address of the repository server"
+"seq"="30"
+
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\prefs\cpof\bc13\cpof\servers\voip]
+"default"="1.2.3.4"
+"type"="ipaddress"
+"value"="10.9.8.7"
+"display"="/Vo/I/P"
+"description"="/I/P address of the /Vo/I/P server"
+"seq"="20"

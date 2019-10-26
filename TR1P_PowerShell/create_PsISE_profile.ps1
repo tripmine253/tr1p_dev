@@ -1,6 +1,8 @@
 ﻿$GomezProfile = @'
+#set WSL env var
 $global:WSLHome = (get-childitem -Recurse -Path "$env:LOCALAPPDATA\Packages\" `
     | Where-Object {$_.FullName -ilike "*CanonicalGroupLimited.Ubuntu18.04*\LocalState\rootfs"} | Select -First 1).FullName
+#base64 encoder blah blah    
 function b64enc {
     Param
     (
@@ -13,6 +15,7 @@ function b64enc {
     $b64enc = [convert]::ToBase64String($bytes)
     return $b64enc
 }
+#handy timestamps
 function timeStamps
 {
     $date = get-date 
@@ -22,6 +25,7 @@ function timeStamps
     $global:UTC = (Get-Date).ToUniversalTime().ToString("hh:mm:ssZddMMMyyyy") # ZULU TIME
 
 }
+# pull in exch modules
 function LoadExchMods
 {
     $creds = Get-Credential

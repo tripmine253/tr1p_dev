@@ -1,4 +1,6 @@
-﻿$Runspacehash = [hashtable]::Synchronized(@{})
+﻿#### I liked this one because it demonstrates xaml UI usage and os hooks
+
+$Runspacehash = [hashtable]::Synchronized(@{})
 $Runspacehash.host = $Host
 $Runspacehash.runspace = [RunspaceFactory]::CreateRunspace()
 $Runspacehash.runspace.ApartmentState = “STA”

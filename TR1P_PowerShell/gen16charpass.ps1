@@ -1,3 +1,4 @@
+# missing policy compliance handling, but not a bad example of the RNG API
 param( 
 [int] $len = 16,
 [string] $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_!@#$%^&*()_"

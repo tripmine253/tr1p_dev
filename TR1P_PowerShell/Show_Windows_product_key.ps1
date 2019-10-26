@@ -1,4 +1,15 @@
-﻿param ($targets = ".")
+﻿# leaks legit productkey
+<#
+Computer     : .
+Caption      : Microsoft Windows 10 Pro     
+CSDVersion   :
+OSArch       : 64-bit
+BuildNumber  : 18362
+RegisteredTo :
+ProductID    : 00330-xxxxx-85215-xxxxx
+ProductKey   : ?????-?????-7????-?????-H3TM5
+#>
+param ($targets = ".")
 $hklm = 2147483650
 $regPath = "Software\Microsoft\Windows NT\CurrentVersion"
 $regValue = "DigitalProductId4"

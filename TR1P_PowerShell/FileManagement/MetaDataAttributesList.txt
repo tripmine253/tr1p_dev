@@ -1,0 +1,328 @@
+Full list of file attributes available from GetDetailsOf function
+===============================================
+NOTE: attributes returning a value will depend on file type
+
+0 - Name
+1 - Size
+2 - Item type
+3 - Date modified
+4 - Date created
+5 - Date accessed
+6 - Attributes
+7 - Offline status
+8 - Availability
+9 - Perceived type
+10 - Owner
+11 - Kind
+12 - Date taken
+13 - Contributing artists
+14 - Album
+15 - Year
+16 - Genre
+17 - Conductors
+18 - Tags
+19 - Rating
+20 - Authors
+21 - Title
+22 - Subject
+23 - Categories
+24 - Comments
+25 - Copyright
+26 - #
+27 - Length
+28 - Bit rate
+29 - Protected
+30 - Camera model
+31 - Dimensions
+32 - Camera maker
+33 - Company
+34 - File description
+35 - Program name
+36 - Duration
+37 - Is online
+38 - Is recurring
+39 - Location
+40 - Optional attendee addresses
+41 - Optional attendees
+42 - Organiser address
+43 - Organiser name
+44 - Reminder time
+45 - Required attendee addresses
+46 - Required attendees
+47 - Resources
+48 - Meeting status
+49 - Free/busy status
+50 - Total size
+51 - Account name
+52 - 
+53 - Task status
+54 - Computer
+55 - Anniversary
+56 - Assistant's name
+57 - Assistant's phone
+58 - Birthday
+59 - Business address
+60 - Business city
+61 - Business country/region
+62 - Business P.O. box
+63 - Business postcode
+64 - Business county/region
+65 - Business street
+66 - Business fax
+67 - Business home page
+68 - Business phone
+69 - Call-back number
+70 - Car phone
+71 - Children
+72 - Company main phone
+73 - Department
+74 - Email address
+75 - Email2
+76 - Email3
+77 - Email list
+78 - Email display name
+79 - File as
+80 - First name
+81 - Full name
+82 - Gender
+83 - Given name
+84 - Hobbies
+85 - Home address
+86 - Home city
+87 - Home country/region
+88 - Home P.O. box
+89 - Home postcode
+90 - Home county/region
+91 - Home street
+92 - Home fax
+93 - Home phone
+94 - IM addresses
+95 - Initials
+96 - Job title
+97 - Label
+98 - Surname
+99 - Postal address
+100 - Middle name
+101 - Mobile phone
+102 - Nickname
+103 - Office location
+104 - Other address
+105 - Other city
+106 - Other country/region
+107 - Other P.O. box
+108 - Other postcode
+109 - Other county/region
+110 - Other street
+111 - Pager
+112 - Personal title
+113 - City
+114 - Country/region
+115 - P.O. box
+116 - Postcode
+117 - County/Region
+118 - Street
+119 - Primary email
+120 - Primary phone
+121 - Profession
+122 - Spouse/Partner
+123 - Suffix
+124 - TTY/TTD phone
+125 - Telex
+126 - Web page
+127 - Content status
+128 - Content type
+129 - Date acquired
+130 - Date archived
+131 - Date completed
+132 - Device category
+133 - Connected
+134 - Discovery method
+135 - Friendly name
+136 - Local computer
+137 - Manufacturer
+138 - Model
+139 - Paired
+140 - Classification
+141 - Status
+142 - Status
+143 - Client ID
+144 - Contributors
+145 - Content created
+146 - Last printed
+147 - Date last saved
+148 - Division
+149 - Document ID
+150 - Pages
+151 - Slides
+152 - Total editing time
+153 - Word count
+154 - Due date
+155 - End date
+156 - File count
+157 - File extension
+158 - Filename
+159 - File version
+160 - Flag colour
+161 - Flag status
+162 - Space free
+163 - 
+164 - 
+165 - Group
+166 - Sharing type
+167 - Bit depth
+168 - Horizontal resolution
+169 - Width
+170 - Vertical resolution
+171 - Height
+172 - Importance
+173 - Is attachment
+174 - Is deleted
+175 - Encryption status
+176 - Has flag
+177 - Is completed
+178 - Incomplete
+179 - Read status
+180 - Shared
+181 - Creators
+182 - Date
+183 - Folder name
+184 - Folder path
+185 - Folder
+186 - Participants
+187 - Path
+188 - By location
+189 - Type
+190 - Contact names
+191 - Entry type
+192 - Language
+193 - Date visited
+194 - Description
+195 - Link status
+196 - Link target
+197 - URL
+198 - 
+199 - 
+200 - 
+201 - Media created
+202 - Date released
+203 - Encoded by
+204 - Episode number
+205 - Producers
+206 - Publisher
+207 - Season number
+208 - Subtitle
+209 - User web URL
+210 - Writers
+211 - 
+212 - Attachments
+213 - Bcc addresses
+214 - Bcc
+215 - Cc addresses
+216 - Cc
+217 - Conversation ID
+218 - Date received
+219 - Date sent
+220 - From addresses
+221 - From
+222 - Has attachments
+223 - Sender address
+224 - Sender name
+225 - Store
+226 - To addresses
+227 - To do title
+228 - To
+229 - Mileage
+230 - Album artist
+231 - Sort album artist
+232 - Album ID
+233 - Sort album
+234 - Sort contributing artists
+235 - Beats-per-minute
+236 - Composers
+237 - Sort composer
+238 - Disc
+239 - Initial key
+240 - Part of a compilation
+241 - Mood
+242 - Part of set
+243 - Full stop
+244 - Colour
+245 - Parental rating
+246 - Parental rating reason
+247 - Space used
+248 - EXIF version
+249 - Event
+250 - Exposure bias
+251 - Exposure program
+252 - Exposure time
+253 - F-stop
+254 - Flash mode
+255 - Focal length
+256 - 35mm focal length
+257 - ISO speed
+258 - Lens maker
+259 - Lens model
+260 - Light source
+261 - Max aperture
+262 - Metering mode
+263 - Orientation
+264 - People
+265 - Program mode
+266 - Saturation
+267 - Subject distance
+268 - White balance
+269 - Priority
+270 - Project
+271 - Channel number
+272 - Episode name
+273 - Closed captioning
+274 - Rerun
+275 - SAP
+276 - Broadcast date
+277 - Program description
+278 - Recording time
+279 - Station call sign
+280 - Station name
+281 - Summary
+282 - Snippets
+283 - Auto summary
+284 - Relevance
+285 - File ownership
+286 - Sensitivity
+287 - Shared with
+287 - Shared with: Homegroup
+288 - Sharing status
+288 - Sharing status: Shared
+289 - 
+289 - : Available
+290 - Product name
+291 - Product version
+292 - Support link
+293 - Source
+294 - Start date
+295 - Sharing
+296 - Sync status
+297 - Billing information
+298 - Complete
+299 - Task owner
+300 - Sort title
+301 - Total file size
+302 - Legal trademarks
+303 - Video compression
+304 - Directors
+305 - Data rate
+306 - Frame height
+307 - Frame rate
+308 - Frame width
+309 - Video orientation
+310 - Total bitrate
+311 - 
+312 - 
+313 - 
+314 - 
+315 - 
+316 - 
+317 - 
+318 - 
+319 - 
+320 - 
