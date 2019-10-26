@@ -1,0 +1,1 @@
+ngrep -W byline -t '^(GET|POST)' 'dst host A.B.C.D and dst port 443' -I file
